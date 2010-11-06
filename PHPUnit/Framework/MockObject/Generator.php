@@ -442,6 +442,14 @@ class PHPUnit_Framework_MockObject_Generator
             $cloneTemplate = $cloneTemplate->render();
         }
 
+		$emptyInterfaceMethods = array();
+
+		if($isInterface && !empty($methods) && is_array($methods))
+		{
+			$emptyInterfaceMethods = $methods;
+			$methods = get_class_methods($mockClassName['fullClassName']);
+		}
+
         if (is_array($methods) && empty($methods) &&
             ($isClass || $isInterface)) {
             $methods = get_class_methods($mockClassName['fullClassName']);
@@ -469,7 +477,7 @@ class PHPUnit_Framework_MockObject_Generator
 
                     if (self::canMockMethod($method)) {
                         $mockedMethods .= self::generateMockedMethodDefinitionFromExisting(
-                          $templateDir, $method
+                          $templateDir, $method, in_array($methodName, $emptyInterfaceMethods)
                         );
                     }
                 }
@@ -571,9 +579,10 @@ class PHPUnit_Framework_MockObject_Generator
     /**
      * @param  string           $templateDir
      * @param  ReflectionMethod $method
+	 * @param  boolean 			$empty
      * @return string
      */
-    protected static function generateMockedMethodDefinitionFromExisting($templateDir, ReflectionMethod $method)
+    protected static function generateMockedMethodDefinitionFromExisting($templateDir, ReflectionMethod $method, $empty = FALSE)
     {
         if ($method->isPrivate()) {
             $modifier = 'private';
@@ -606,7 +615,8 @@ class PHPUnit_Framework_MockObject_Generator
           $modifier,
           PHPUnit_Util_Class::getMethodParameters($method),
           $reference,
-          $static
+          $static,
+		  $empty
         );
     }
 
@@ -618,18 +628,26 @@ class PHPUnit_Framework_MockObject_Generator
      * @param  string  $arguments
      * @param  string  $reference
      * @param  boolean $static
+	 * @param  boolean $empty
      * @return string
      */
-    protected static function generateMockedMethodDefinition($templateDir, $className, $methodName, $modifier = 'public', $arguments = '', $reference = '', $static = FALSE)
+    protected static function generateMockedMethodDefinition($templateDir, $className, $methodName, $modifier = 'public', $arguments = '', $reference = '', $static = FALSE, $empty = FALSE)
     {
         if ($static) {
             $template = new Text_Template(
               $templateDir . 'mocked_static_method.tpl'
             );
         } else {
-            $template = new Text_Template(
-              $templateDir . 'mocked_object_method.tpl'
-            );
+			if($empty===TRUE)
+			{
+				$template = new Text_Template(
+	              $templateDir . 'mocked_object_empty_method.tpl'
+	            );
+			} else {
+				$template = new Text_Template(
+	              $templateDir . 'mocked_object_method.tpl'
+	            );
+			}
         }
 
         $template->setVar(
