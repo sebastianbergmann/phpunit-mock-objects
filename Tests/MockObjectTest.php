@@ -183,6 +183,19 @@ class Framework_MockObjectTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('pass', $mock->doSomething('foo', 'bar'));
     }
 
+    public function testPublicMethodMap()
+    {
+        $map = array();
+        $map['foo']['bar'] = 'pass';
+
+        $mock = $this->getMock('SomeClass', array('doSomething'), array(), '', FALSE);
+        $mock->expects($this->once())
+             ->method('doSomething')
+             ->will($this->returnValueMap($map));
+
+        $this->assertEquals('pass', $mock->doSomething('foo', 'bar'));
+    }
+
     public function testMockClassOnlyGeneratedOnce()
     {
         $mock1 = $this->getMock('AnInterface');

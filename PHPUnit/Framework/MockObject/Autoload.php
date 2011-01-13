@@ -81,6 +81,7 @@ function phpunit_mockobject_autoload($class) {
           'phpunit_framework_mockobject_stub_consecutivecalls' => '/Framework/MockObject/Stub/ConsecutiveCalls.php',
           'phpunit_framework_mockobject_stub_return' => '/Framework/MockObject/Stub/Return.php',
           'phpunit_framework_mockobject_stub_returncallback' => '/Framework/MockObject/Stub/ReturnCallback.php',
+          'phpunit_framework_mockobject_stub_returnvaluemap' => '/Framework/MockObject/Stub/ReturnValueMap.php',
           'phpunit_framework_mockobject_stub_exception' => '/Framework/MockObject/Stub/Exception.php',
           'phpunit_framework_mockobject_stub_returnself' => '/Framework/MockObject/Stub/ReturnSelf.php',
           'phpunit_framework_mockobject_stub_returnargument' => '/Framework/MockObject/Stub/ReturnArgument.php'
