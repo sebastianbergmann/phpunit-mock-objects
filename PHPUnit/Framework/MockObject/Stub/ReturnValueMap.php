@@ -56,8 +56,9 @@
 class PHPUnit_Framework_MockObject_Stub_ReturnValueMap implements PHPUnit_Framework_MockObject_Stub
 {
     protected $valueMap;
+    protected $valueSpecifications = array();
 
-    public function __construct($valueMap)
+    public function __construct($valueMap = array())
     {
         $this->valueMap = $valueMap;
     }
@@ -65,14 +66,91 @@ class PHPUnit_Framework_MockObject_Stub_ReturnValueMap implements PHPUnit_Framew
     public function invoke(PHPUnit_Framework_MockObject_Invocation $invocation)
     {
         $value = $this->valueMap;
+        foreach ($this->valueSpecifications as $spec) {
+            if ($spec->matches($invocation->parameters)) {
+                return $spec->value();
+            }
+        }
         foreach ($invocation->parameters as $param) {
             $value = $value[$param];
         }
         return $value;
     }
 
+    /**
+     * Accepts the same signature of the mocked method. Adds the parameter
+     * to the matching list.
+     * @return PHPUnit_Framework_MockObject_Stub_ReturnValueMap_ValueSpec
+     */
+    public function record()
+    {
+        $arguments = func_get_args();
+        $spec = new PHPUnit_Framework_MockObject_Stub_ReturnValueMap_ValueSpec($this, $arguments);
+        $this->valueSpecifications[] = $spec;
+        return $spec;
+    }
+
     public function toString()
     {
         return "return a value extracted from the map:\n" . print_r($this->valueMap, true);
+    }
+}
+
+class PHPUnit_Framework_MockObject_Stub_ReturnValueMap_ValueSpec
+{
+    /**
+     * @PHPUnit_Framework_MockObject_Stub_ReturnValueMap
+     */
+    protected $map;
+
+    /**
+     * @var array   elements are PHPUnit_Framework_Constraint
+     */
+    protected $arguments;
+
+    protected $returnValue;
+
+    public function __construct(PHPUnit_Framework_MockObject_Stub_ReturnValueMap $map, array $arguments)
+    {
+        $this->map = $map;
+        foreach ($arguments as $argument) {
+            if ($argument instanceof PHPUnit_Framework_Constraint) {
+                $this->arguments[] = $argument;
+            } else {
+                $this->arguments[] = new PHPUnit_Framework_Constraint_IsEqual($argument);
+            }
+        }
+    }
+
+    /**
+     * @param mixed $returnValue
+     * @return PHPUnit_Framework_MockObject_Stub_ReturnValueMap
+     */
+    public function returns($returnValue)
+    {
+        $this->returnValue = $returnValue;
+        return $this->map;
+    }
+
+    /**
+     * @internal
+     */
+    public function matches($arguments)
+    {
+        $satisfied = true;
+        foreach ($this->arguments as $index => $expectedArgument) {
+            if (!$expectedArgument->evaluate($arguments[$index])) {
+                $satisfied = false;
+            }
+        }
+        return $satisfied;
+    }
+
+    /**
+     * @internal
+     */
+    public function value()
+    {
+        return $this->returnValue;
     }
 }

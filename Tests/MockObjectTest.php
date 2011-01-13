@@ -196,6 +196,34 @@ class Framework_MockObjectTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('pass', $mock->doSomething('foo', 'bar'));
     }
 
+    public function testPublicMethodMapWithRecording()
+    {
+        $mock = $this->getMock('SomeClass', array('doSomething'), array(), '', FALSE);
+        $mock->expects($this->any())
+             ->method('doSomething')
+             ->will($map = $this->returnValueMap());
+
+        $map->record('foo', 'bar')->returns('pass')
+            ->record('lucky', 'happy')->returns('anotherPass');
+
+        $this->assertEquals('pass', $mock->doSomething('foo', 'bar'));
+        $this->assertEquals('anotherPass', $mock->doSomething('lucky', 'happy'));
+    }
+
+    public function testPublicMethodMapWithConstraints()
+    {
+        $mock = $this->getMock('SomeClass', array('doSomething'), array(), '', FALSE);
+        $mock->expects($this->any())
+             ->method('doSomething')
+             ->will($map = $this->returnValueMap());
+
+        $map->record($this->anything(), 'bar')->returns('pass')
+            ->record('lucky', $this->isInstanceOf('stdClass'))->returns('anotherPass');
+
+        $this->assertEquals('pass', $mock->doSomething('foo', 'bar'));
+        $this->assertEquals('anotherPass', $mock->doSomething('lucky', new stdClass));
+    }
+
     public function testMockClassOnlyGeneratedOnce()
     {
         $mock1 = $this->getMock('AnInterface');
