@@ -115,7 +115,7 @@ class Framework_MockObjectTest extends PHPUnit_Framework_TestCase
         $mock->doSomethingElse('something');
     }
 
-    public function testMockedMethodIsCalledOnceWithIdenticalParameter()
+    public function testMockedMethodIsCalledOnceWithIdenticalObjectParameter()
     {
         $object = new \stdClass;
 
@@ -125,6 +125,16 @@ class Framework_MockObjectTest extends PHPUnit_Framework_TestCase
              ->with($this->identicalTo($object));
 
         $mock->doSomethingElse($object);
+    }
+
+    public function testMockedMethodIsCalledOnceWithIdenticalScalarParameter()
+    {
+        $mock = $this->getMock('SomeClass');
+        $mock->expects($this->once())
+             ->method('doSomethingElse')
+             ->with($this->identicalTo('42'));
+
+        $mock->doSomethingElse('42');
     }
 
     public function testMockedMethodIsCalledExactly()
