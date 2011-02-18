@@ -96,6 +96,11 @@ class PHPUnit_Framework_MockObject_Invocation_Static implements PHPUnit_Framewor
     public $parameters;
 
     /**
+     * @var array   SPL hashes, only for object parameters
+     */
+    public $objectParametersHashes;
+
+    /**
      * @param string $className
      * @param string $methodname
      * @param array  $parameters
@@ -109,6 +114,7 @@ class PHPUnit_Framework_MockObject_Invocation_Static implements PHPUnit_Framewor
         foreach ($this->parameters as $key => $value) {
             if (is_object($value)) {
                 $this->parameters[$key] = $this->cloneObject($value);
+                $this->objectParametersHashes[$key] = spl_object_hash($value);
             }
         }
     }

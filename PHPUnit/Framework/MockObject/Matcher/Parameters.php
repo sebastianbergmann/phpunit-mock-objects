@@ -145,7 +145,11 @@ class PHPUnit_Framework_MockObject_Matcher_Parameters extends PHPUnit_Framework_
         }
 
         foreach ($this->parameters as $i => $parameter) {
-            if (!$parameter->evaluate($this->invocation->parameters[$i])) {
+            $actual = $this->invocation->parameters[$i];
+            if ($parameter instanceof PHPUnit_Framework_Constraint_IsIdentical) {
+                $actual = $this->invocation->objectParametersHashes[$i];
+            }
+            if (!$parameter->evaluate($actual)) {
                 $parameter->fail(
                   $this->invocation->parameters[$i],
                   sprintf(
