@@ -462,7 +462,9 @@ class PHPUnit_Framework_MockObject_Generator
             else if ($class->hasMethod($originalClassName)) {
                 $constructor = $class->getMethod($originalClassName);
             }
-
+            
+            $methods = array_unique($methods);
+            
             foreach ($methods as $methodName) {
                 try {
                     $method = $class->getMethod($methodName);
