@@ -268,7 +268,7 @@ class PHPUnit_Framework_MockObject_Generator
             }
 
             if (empty($methods)) {
-                $methods = NULL;
+                $methods = array();
             }
 
             return self::getMock(
