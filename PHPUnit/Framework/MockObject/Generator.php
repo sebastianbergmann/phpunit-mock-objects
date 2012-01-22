@@ -351,6 +351,33 @@ class PHPUnit_Framework_MockObject_Generator
     }
 
     /**
+     * Returns a function mock.
+     *
+     * @param  string $functionName     name of function to mock
+     * @param  string $targetNamespace  namespace to hook the mocked function into
+     * @return PHPUnit_Framework_MockObject_MockFunction
+     * @throws InvalidArgumentException
+     */
+    public static function getFunctionMock($functionName, $targetNamespace)
+    {
+        if (!is_string($functionName)) {
+            throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'string');
+        }
+
+        if (!is_string($targetNamespace)) {
+            throw PHPUnit_Util_InvalidArgumentHelper::factory(2, 'string');
+        }
+
+        if (!function_exists($targetNamespace . '\\' . $functionName)) {
+            $templateDir = dirname(__FILE__) . DIRECTORY_SEPARATOR . 'Generator' .
+                         DIRECTORY_SEPARATOR;
+            eval(self::generateMockedFunctionDefinitionFromExisting($templateDir, new ReflectionFunction($functionName), $targetNamespace));
+        }
+
+        return new PHPUnit_Framework_MockObject_MockFunction($functionName);
+    }
+
+    /**
      * @param  string  $originalClassName
      * @param  array   $methods
      * @param  string  $mockClassName
@@ -762,5 +789,58 @@ class PHPUnit_Framework_MockObject_Generator
         }
 
         return TRUE;
+    }
+
+    /**
+     * @param  string           $templateDir
+     * @param  ReflectionMethod $method
+     * @return string
+     */
+    protected static function generateMockedFunctionDefinitionFromExisting($templateDir, ReflectionFunction $function, $targetNamespace)
+    {
+        if ($function->returnsReference()) {
+            $reference = '&';
+        } else {
+            $reference = '';
+        }
+
+        return self::generateMockedFunctionDefinition(
+          $templateDir,
+          $targetNamespace,
+          $function->getName(),
+          PHPUnit_Util_Class::getMethodParameters($function),
+          PHPUnit_Util_Class::getMethodParameters($function, TRUE),
+          $reference
+        );
+    }
+
+    /**
+     * @param  string  $templateDir
+     * @param  string  $namespaceName
+     * @param  string  $functionName
+     * @param  string  $arguments_decl
+     * @param  string  $arguments_call
+     * @param  string  $reference
+     * @param  boolean $static
+     * @return string
+     */
+    protected static function generateMockedFunctionDefinition($templateDir, $namespaceName, $functionName, $arguments_decl = '', $arguments_call = '', $reference = '')
+    {
+        $template = new Text_Template(
+            $templateDir . 'mocked_function.tpl'
+        );
+
+        $template->setVar(
+          array(
+            'arguments_decl'  => $arguments_decl,
+            'arguments_call'  => $arguments_call,
+            'arguments_count' => !empty($arguments_call) ? count(explode(',', $arguments_call)) : 0,
+            'namespace_name'  => $namespaceName,
+            'function_name'   => $functionName,
+            'reference'       => $reference
+          )
+        );
+
+        return $template->render();
     }
 }

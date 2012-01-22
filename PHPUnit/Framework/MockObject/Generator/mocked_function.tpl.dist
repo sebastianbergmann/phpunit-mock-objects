@@ -1,0 +1,25 @@
+
+namespace {namespace_name} {
+    function {reference}{function_name}({arguments_decl})
+    {
+        $arguments = array({arguments_call});
+        $count     = func_num_args();
+
+        if ($count > {arguments_count}) {
+            $_arguments = func_get_args();
+
+            for ($i = {arguments_count}; $i < $count; $i++) {
+                $arguments[] = $_arguments[$i];
+            }
+        }
+
+        $result = \PHPUnit_Framework_MockObject_MockFunction::getInstance('{function_name}')
+                   ->__phpunit_getInvocationMocker()->invoke(
+          new \PHPUnit_Framework_MockObject_Invocation_Function(
+            '{function_name}', $arguments
+          )
+        );
+
+        return $result;
+    }
+}
