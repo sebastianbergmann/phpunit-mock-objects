@@ -138,7 +138,7 @@ class PHPUnit_Framework_MockObject_FunctionInvocationMocker implements PHPUnit_F
 
     /**
      * @param  PHPUnit_Framework_MockObject_Matcher_Invocation $matcher
-     * @return PHPUnit_Framework_MockObject_Builder_InvocationMocker
+     * @return PHPUnit_Framework_MockObject_Builder_FunctionInvocationMocker
      */
     public function expects(PHPUnit_Framework_MockObject_Matcher_Invocation $matcher)
     {
