@@ -81,7 +81,6 @@ class PHPUnit_Framework_MockObject_MockFunction /*implements PHPUnit_Framework_M
     /**
      * @param  string $functionName
      * @return PHPUnit_Framework_MockObject_MockFunction
-     * @throws LogicException
      */
     public static function getInstance($functionName)
     {
@@ -89,7 +88,7 @@ class PHPUnit_Framework_MockObject_MockFunction /*implements PHPUnit_Framework_M
             return self::$mocks[$functionName];
         }
 
-        throw new LogicException('Missing mock for function ' . $functionName);
+        return new self($functionName);
     }
 
     /**
