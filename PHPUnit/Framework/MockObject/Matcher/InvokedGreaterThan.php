@@ -92,7 +92,7 @@ class PHPUnit_Framework_MockObject_Matcher_InvokedGreaterThan extends PHPUnit_Fr
 
         if (!($count > $this->requiredInvocations)) {
             throw new PHPUnit_Framework_ExpectationFailedException(
-                'Expected invocation at least ' . $this->requiredInvocations .
+                'Expected invocation more than ' . $this->requiredInvocations .
                 ' times but it occured ' . $count . ' time(s).'
             );
         }
