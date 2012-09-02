@@ -31,14 +31,14 @@ print $mock['code'];
 --EXPECTF--
 class MockFoo extends NS\Foo implements PHPUnit_Framework_MockObject_MockObject
 {
-    private static $staticInvocationMocker;
-    private $invocationMocker;
-    private $id;
-    private static $nextId = 0;
+    private static $phpunitMockObjectStaticInvocationMocker;
+    private $phpunitMockObjectInvocationMocker;
+    private $phpunitMockObjectId;
+    private static $phpunitMockObjectNextId = 0;
 
     public function __clone()
     {
-        $this->invocationMocker = clone $this->__phpunit_getInvocationMocker();
+        $this->phpunitMockObjectInvocationMocker = clone $this->__phpunit_getInvocationMocker();
         $this->__phpunit_setId();
     }
 
@@ -98,20 +98,20 @@ class MockFoo extends NS\Foo implements PHPUnit_Framework_MockObject_MockObject
 
     public function __phpunit_getInvocationMocker()
     {
-        if ($this->invocationMocker === NULL) {
-            $this->invocationMocker = new PHPUnit_Framework_MockObject_InvocationMocker;
+        if ($this->phpunitMockObjectInvocationMocker === NULL) {
+            $this->phpunitMockObjectInvocationMocker = new PHPUnit_Framework_MockObject_InvocationMocker;
         }
 
-        return $this->invocationMocker;
+        return $this->phpunitMockObjectInvocationMocker;
     }
 
     public static function __phpunit_getStaticInvocationMocker()
     {
-        if (self::$staticInvocationMocker === NULL) {
-            self::$staticInvocationMocker = new PHPUnit_Framework_MockObject_InvocationMocker;
+        if (self::$phpunitMockObjectStaticInvocationMocker === NULL) {
+            self::$phpunitMockObjectStaticInvocationMocker = new PHPUnit_Framework_MockObject_InvocationMocker;
         }
 
-        return self::$staticInvocationMocker;
+        return self::$phpunitMockObjectStaticInvocationMocker;
     }
 
     public function __phpunit_hasMatchers()
@@ -128,13 +128,13 @@ class MockFoo extends NS\Foo implements PHPUnit_Framework_MockObject_MockObject
 
     public function __phpunit_cleanup()
     {
-        self::$staticInvocationMocker = NULL;
-        $this->invocationMocker       = NULL;
-        $this->id                     = NULL;
+        self::$phpunitMockObjectStaticInvocationMocker = NULL;
+        $this->phpunitMockObjectInvocationMocker       = NULL;
+        $this->phpunitMockObjectId                     = NULL;
     }
 
     public function __phpunit_setId()
     {
-        $this->id = sprintf('%s#%s', get_class($this), self::$nextId++);
+        $this->phpunitMockObjectId = sprintf('%s#%s', get_class($this), self::$phpunitMockObjectNextId++);
     }
 }
