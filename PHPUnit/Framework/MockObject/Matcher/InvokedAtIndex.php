@@ -71,7 +71,14 @@ class PHPUnit_Framework_MockObject_Matcher_InvokedAtIndex implements PHPUnit_Fra
      * @var integer
      */
     protected $currentIndex = -1;
+    
+    
+    /**
+    * @var array
+    */
 
+    protected $indexes = array();
+    
     /**
      * @param integer $sequenceIndex
      */
@@ -94,10 +101,13 @@ class PHPUnit_Framework_MockObject_Matcher_InvokedAtIndex implements PHPUnit_Fra
      */
     public function matches(PHPUnit_Framework_MockObject_Invocation $invocation)
     {
-        $this->currentIndex++;
-
-        return $this->currentIndex == $this->sequenceIndex;
-    }
+		if (!isset($this->indexes[$invocation->methodName])) $this->indexes[$invocation->methodName] = 0;
+		else $this->indexes[$invocation->methodName]++;
+		$this->currentIndex++;
+	
+        return $this->indexes[$invocation->methodName] == $this->sequenceIndex;
+	}
+	
 
     /**
      * @param PHPUnit_Framework_MockObject_Invocation $invocation
