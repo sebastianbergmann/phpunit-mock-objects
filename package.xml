@@ -181,6 +181,7 @@
     <name>Text_Template</name>
     <channel>pear.phpunit.de</channel>
     <min>1.1.1</min>
+    <max>1.1.2</max>
    </package>
    <extension>
     <name>reflection</name>
