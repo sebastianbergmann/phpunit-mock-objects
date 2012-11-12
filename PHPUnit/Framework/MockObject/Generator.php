@@ -217,6 +217,56 @@ class PHPUnit_Framework_MockObject_Generator
     }
 
     /**
+     * Returns a mock class for the specified class.
+     *
+     * @param  string  $originalClassName
+     * @param  array   $methods
+     * @param  string  $mockClassName
+     * @param  boolean $callOriginalClone
+     * @param  boolean $callAutoload
+     * @return object
+     * @throws InvalidArgumentException
+     * @since  Method available since Release 1.0.0
+     */
+    public static function getClass($originalClassName, $methods = array(), $mockClassName = '', $callOriginalClone = TRUE, $callAutoload = TRUE)
+    {
+        if (!is_string($originalClassName)) {
+            throw PHPUnit_Util_InvalidArgumentHelper::factory(1, 'string');
+        }
+
+        if (!is_string($mockClassName)) {
+            throw PHPUnit_Util_InvalidArgumentHelper::factory(4, 'string');
+        }
+
+        if (!is_array($methods) && !is_null($methods)) {
+            throw new InvalidArgumentException;
+        }
+
+        if ($mockClassName != '' && class_exists($mockClassName, FALSE)) {
+            throw new PHPUnit_Framework_Exception(
+              sprintf(
+                'Class "%s" already exists.',
+                $mockClassName
+              )
+            );
+        }
+
+        $mock = self::generate(
+          $originalClassName,
+          $methods,
+          $mockClassName,
+          $callOriginalClone,
+          $callAutoload
+        );
+
+        if (!class_exists($mock['mockClassName'], FALSE)) {
+            eval($mock['code']);
+        }
+
+		return $mock['mockClassName'];
+    }
+
+    /**
      * @param  string $code
      * @param  string $className
      * @param  string $originalClassName
