@@ -606,6 +606,7 @@ class PHPUnit_Framework_MockObject_Generator
         $cloneTemplate = '';
         $isClass       = FALSE;
         $isInterface   = FALSE;
+        $checkMethods  = FALSE;
 
         $mockClassName = $this->generateClassName(
           $originalClassName, $mockClassName, 'Mock_'
@@ -674,6 +675,7 @@ class PHPUnit_Framework_MockObject_Generator
         if (is_array($methods) && empty($methods) &&
             ($isClass || $isInterface)) {
             $methods = get_class_methods($mockClassName['fullClassName']);
+            $checkMethods = TRUE;
         }
 
         if (!is_array($methods)) {
@@ -696,7 +698,7 @@ class PHPUnit_Framework_MockObject_Generator
                 try {
                     $method = $class->getMethod($methodName);
 
-                    if ($this->canMockMethod($method)) {
+                    if (!$checkMethods || $this->canMockMethod($method)) {
                         $mockedMethods .= $this->generateMockedMethodDefinitionFromExisting(
                           $templateDir, $method, $cloneArguments
                         );
