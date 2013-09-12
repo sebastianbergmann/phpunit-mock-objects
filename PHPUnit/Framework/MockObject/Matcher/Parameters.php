@@ -157,4 +157,11 @@ class PHPUnit_Framework_MockObject_Matcher_Parameters extends PHPUnit_Framework_
             );
         }
     }
+    
+    /**
+     * Getter for the invocation. 
+     */
+    public function getInvocation(){
+        return $this->invocation;
+    }
 }
