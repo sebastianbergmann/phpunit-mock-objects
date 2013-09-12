@@ -82,6 +82,6 @@ class PHPUnit_Framework_MockObject_Matcher_AnyParameters extends PHPUnit_Framewo
      * Getter for the invocation. 
      */
     public function getInvocation(){
-        return $this-invocation;
+        return $this->invocation;
     }
 }
