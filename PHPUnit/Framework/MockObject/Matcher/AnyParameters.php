@@ -56,6 +56,11 @@
 class PHPUnit_Framework_MockObject_Matcher_AnyParameters extends PHPUnit_Framework_MockObject_Matcher_StatelessInvocation
 {
     /**
+     * @var PHPUnit_Framework_MockObject_Invocation
+     */
+    protected $invocation;
+    
+    /**
      * @return string
      */
     public function toString()
@@ -69,6 +74,14 @@ class PHPUnit_Framework_MockObject_Matcher_AnyParameters extends PHPUnit_Framewo
      */
     public function matches(PHPUnit_Framework_MockObject_Invocation $invocation)
     {
+        $this->invocation = $invocation
         return TRUE;
+    }
+    
+    /**
+     * Getter for the invocation. 
+     */
+    public function getInvocation(){
+        return $this-invocation;
     }
 }
