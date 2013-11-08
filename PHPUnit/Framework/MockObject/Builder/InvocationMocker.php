@@ -104,11 +104,17 @@ class PHPUnit_Framework_MockObject_Builder_InvocationMocker implements PHPUnit_F
     }
 
     /**
-     * @param  PHPUnit_Framework_MockObject_Stub $stub
+     * @param  PHPUnit_Framework_MockObject_Stub|mixed $stub
      * @return PHPUnit_Framework_MockObject_Builder_InvocationMocker
      */
-    public function will(PHPUnit_Framework_MockObject_Stub $stub)
+    public function will($stub)
     {
+        if (!($stub instanceof PHPUnit_Framework_MockObject_Stub)) {
+            $stub = new PHPUnit_Framework_MockObject_Stub_Return(
+              $stub
+            );
+        }
+
         $this->matcher->stub = $stub;
 
         return $this;
