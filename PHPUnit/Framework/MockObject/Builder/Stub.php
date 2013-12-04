@@ -57,7 +57,9 @@ interface PHPUnit_Framework_MockObject_Builder_Stub extends PHPUnit_Framework_Mo
 {
     /**
      * Stubs the matching method with the stub object $stub. Any invocations of
-     * the matched method will now be handled by the stub instead.
+     * the matched method will now be handled by the stub instead. If the stub object
+     * does not implement the PHPUnit_Framework_MockObject_Stub interface, the value 
+     * of $stub will be returned on invocation.
      *
      * @param PHPUnit_Framework_MockObject_Stub|mixed $stub The stub object.
      * @return PHPUnit_Framework_MockObject_Builder_Identity
