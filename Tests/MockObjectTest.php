@@ -141,6 +141,16 @@ class Framework_MockObjectTest extends PHPUnit_Framework_TestCase
         $mock->doSomething();
     }
 
+    public function testStubbedValue()
+    {
+        $mock = $this->getMock('AnInterface');
+        $mock->expects($this->any())
+             ->method('doSomething')
+             ->will('something');
+
+        $this->assertEquals('something', $mock->doSomething());
+    }
+
     public function testStubbedException()
     {
         $mock = $this->getMock('AnInterface');
@@ -382,6 +392,24 @@ class Framework_MockObjectTest extends PHPUnit_Framework_TestCase
         $mock2 = $this->getMock('PartialMockTestClass', array(), array(), '', TRUE, FALSE);
 
         $this->assertNotEquals(get_class($mock1), get_class($mock2));
+    }
+
+    public function testStubbedValueForStaticMethod()
+    {
+        $this->getMockClass(
+          'StaticMockTestClass',
+          array('doSomething'),
+          array(),
+          'StaticMockTestClassMock'
+        );
+
+        StaticMockTestClassMock::staticExpects($this->any())
+          ->method('doSomething')
+          ->will('something');
+
+        $this->assertEquals(
+          'something', StaticMockTestClassMock::doSomething()
+        );
     }
 
     public function testStubbedReturnValueForStaticMethod()
