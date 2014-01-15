@@ -112,6 +112,60 @@ class Framework_MockObjectTest extends PHPUnit_Framework_TestCase
         $mock->doSomething();
     }
 
+    public function testMockedMethodIsCalledGreaterThan()
+    {
+        $mock = $this->getMock('AnInterface');
+        $mock->expects(new PHPUnit_Framework_MockObject_Matcher_InvokedGreaterThan(2))
+             ->method('doSomething');
+
+        $mock->doSomething();
+        $mock->doSomething();
+        $mock->doSomething();
+    }
+
+    public function testMockedMethodIsCalledGreaterThanFailsOnExactCount()
+    {
+        $mock = $this->getMock('AnInterface');
+        $mock->expects(new PHPUnit_Framework_MockObject_Matcher_InvokedGreaterThan(2))
+             ->method('doSomething');
+
+        $mock->doSomething();
+        $mock->doSomething();
+        try {
+            $mock->__phpunit_verify();
+            $this->fail('Expected exception');
+        } catch (PHPUnit_Framework_ExpectationFailedException $e) {
+            $this->assertSame(
+                "Expectation failed for method name is equal to <string:doSomething> when invoked more than 2 times.\n" .
+                'Expected invocation more than 2 times but it occured 2 time(s).',
+                $e->getMessage()
+            );
+        }
+
+        $this->resetMockObjects();
+    }
+
+    public function testMockedMethodIsCalledGreaterThanFailsIfLessThanCount()
+    {
+        $mock = $this->getMock('AnInterface');
+        $mock->expects(new PHPUnit_Framework_MockObject_Matcher_InvokedGreaterThan(2))
+             ->method('doSomething');
+
+        $mock->doSomething();
+        try {
+            $mock->__phpunit_verify();
+            $this->fail('Expected exception');
+        } catch (PHPUnit_Framework_ExpectationFailedException $e) {
+            $this->assertSame(
+                "Expectation failed for method name is equal to <string:doSomething> when invoked more than 2 times.\n" .
+                'Expected invocation more than 2 times but it occured 1 time(s).',
+                $e->getMessage()
+            );
+        }
+
+        $this->resetMockObjects();
+    }
+
     public function testMockedMethodIsCalledOnce()
     {
         $mock = $this->getMock('AnInterface');
