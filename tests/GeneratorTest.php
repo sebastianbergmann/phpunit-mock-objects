@@ -71,7 +71,7 @@ class Framework_MockObject_GeneratorTest extends PHPUnit_Framework_TestCase
     /**
      * @covers PHPUnit_Framework_MockObject_Generator::getMockForTrait
      */
-    public function testGetMockForAbstractClassWithNonExistentMethodsAndNonAbstractMethods()
+    public function testGetMockForTraitWithNonExistentMethodsAndNonAbstractMethods()
     {
         $mock = $this->generator->getMockForTrait(
             'AbstractTrait', array(), '',  true,
