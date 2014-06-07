@@ -148,11 +148,14 @@ class Framework_MockObject_GeneratorTest extends PHPUnit_Framework_TestCase
      */
     public function testGetMockForSingletonWithReflectionSuccess()
     {
-        // Probably, this should be moved to tests/autoload.php
-        require_once __DIR__ . '/_fixture/SingletonClass.php';
-
         $mock = $this->generator->getMock('SingletonClass', array('doSomething'), array(), '', false);
         $this->assertInstanceOf('SingletonClass', $mock);
+    }
+
+    public function testGetMockForClassExtendingInternalClass()
+    {
+        $mock = $this->generator->getMock('InternalClassExtension', array(), array(), '', false);
+        $this->assertInstanceOf('InternalClassExtension', $mock);
     }
 
     /**
