@@ -23,11 +23,13 @@ spl_autoload_register(
                 'framework_mockobjecttest' => '/MockObjectTest.php',
                 'framework_proxyobjecttest' => '/ProxyObjectTest.php',
                 'interfacewithstaticmethod' => '/_fixture/InterfaceWithStaticMethod.php',
+                'internalclassextension' => '/_fixture/InternalClassExtension.php',
                 'methodcallback' => '/_fixture/MethodCallback.php',
                 'methodcallbackbyreference' => '/_fixture/MethodCallbackByReference.php',
                 'mockable' => '/_fixture/Mockable.php',
                 'partialmocktestclass' => '/_fixture/PartialMockTestClass.php',
                 'someclass' => '/_fixture/SomeClass.php',
+                'singletonclass' => '/_fixture/SingletonClass.php',
                 'staticmocktestclass' => '/_fixture/StaticMockTestClass.php',
                 'traversablemocktestinterface' => '/_fixture/TraversableMockTestInterface.php'
             );

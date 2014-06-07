@@ -269,7 +269,14 @@ class PHPUnit_Framework_MockObject_Generator
             }
         } else {
             $class = new ReflectionClass($className);
-            if ($class->isInternal() || version_compare(PHP_VERSION, '5.4.0', '<')) {
+            $parent = $class;
+            $isInternal = false;
+
+            while (false === $isInternal && false !== $parent = $parent->getParentClass()) {
+                $isInternal = false !== $parent && $parent->isInternal();
+            }
+
+            if ($isInternal || version_compare(PHP_VERSION, '5.4.0', '<')) {
                 $object = unserialize(
                     sprintf('O:%d:"%s":0:{}', strlen($className), $className)
                 );
