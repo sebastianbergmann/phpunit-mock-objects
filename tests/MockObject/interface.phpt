@@ -89,6 +89,16 @@ class MockFoo implements PHPUnit_Framework_MockObject_MockObject, Foo
         return $this->expects(new PHPUnit_Framework_MockObject_Matcher_InvokedAtLeastOnce);
     }
 
+    public function expectsAtMost($count)
+    {
+        return $this->expects(new PHPUnit_Framework_MockObject_Matcher_InvokedAtMostCount($count));
+    }
+
+    public function expectsAtLeast($count)
+    {
+        return $this->expects(new PHPUnit_Framework_MockObject_Matcher_InvokedAtLeastCount($count));
+    }
+
     public function method()
     {
         $any = new PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount;

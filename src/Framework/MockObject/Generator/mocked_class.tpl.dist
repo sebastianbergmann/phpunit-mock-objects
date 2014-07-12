@@ -38,6 +38,16 @@
     {
         return $this->expects(new PHPUnit_Framework_MockObject_Matcher_InvokedAtLeastOnce);
     }
+
+    public function expectsAtMost($count)
+    {
+        return $this->expects(new PHPUnit_Framework_MockObject_Matcher_InvokedAtMostCount($count));
+    }
+
+    public function expectsAtLeast($count)
+    {
+        return $this->expects(new PHPUnit_Framework_MockObject_Matcher_InvokedAtLeastCount($count));
+    }
 {method}
     public function __phpunit_setOriginalObject($originalObject)
     {
