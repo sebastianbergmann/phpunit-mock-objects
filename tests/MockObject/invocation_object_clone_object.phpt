@@ -88,6 +88,36 @@ class MockFoo extends Foo implements PHPUnit_Framework_MockObject_MockObject
         return $this->__phpunit_getInvocationMocker()->expects($matcher);
     }
 
+    public function expectsOnce()
+    {
+        return $this->expects(new PHPUnit_Framework_MockObject_Matcher_InvokedCount(1));
+    }
+
+    public function expectsAny()
+    {
+        return $this->expects(new PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount);
+    }
+
+    public function expectsExactly($count)
+    {
+        return $this->expects(new PHPUnit_Framework_MockObject_Matcher_InvokedCount($count));
+    }
+
+    public function expectsNever()
+    {
+        return $this->expects(new PHPUnit_Framework_MockObject_Matcher_InvokedCount(0));
+    }
+
+    public function expectsAt($index)
+    {
+        return $this->expects(new PHPUnit_Framework_MockObject_Matcher_InvokedAtIndex($index));
+    }
+
+    public function expectsAtLeastOnce()
+    {
+        return $this->expects(new PHPUnit_Framework_MockObject_Matcher_InvokedAtLeastOnce);
+    }
+
     public function method()
     {
         $any = new PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount;
