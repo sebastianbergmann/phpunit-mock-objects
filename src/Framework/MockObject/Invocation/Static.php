@@ -98,6 +98,11 @@ class PHPUnit_Framework_MockObject_Invocation_Static implements PHPUnit_Framewor
     public $parameters;
 
     /**
+     * @var boolean
+     */
+    public $evaluated;
+
+    /**
      * @param string  $className
      * @param string  $methodname
      * @param array   $parameters
@@ -108,6 +113,7 @@ class PHPUnit_Framework_MockObject_Invocation_Static implements PHPUnit_Framewor
         $this->className  = $className;
         $this->methodName = $methodName;
         $this->parameters = $parameters;
+        $this->evaluated = false;
 
         if (!$cloneObjects) {
             return;

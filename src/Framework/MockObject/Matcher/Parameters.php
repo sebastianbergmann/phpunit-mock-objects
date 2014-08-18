@@ -142,6 +142,16 @@ class PHPUnit_Framework_MockObject_Matcher_Parameters extends PHPUnit_Framework_
             );
         }
 
+        // initialize evaluated-flag if necessary
+        if (!isset($this->invocation->evaluated)) {
+            $this->invocation->evaluated = false;
+        }
+
+        // do not evaluate parameters twice
+        if ($this->invocation->evaluated) {
+            return true;
+        }
+
         foreach ($this->parameters as $i => $parameter) {
             $parameter->evaluate(
               $this->invocation->parameters[$i],
@@ -154,6 +164,9 @@ class PHPUnit_Framework_MockObject_Matcher_Parameters extends PHPUnit_Framework_
               )
             );
         }
+
+        // mark as evaluated
+        $this->invocation->evaluated = true;
 
         return true;
     }

@@ -61,6 +61,11 @@ class PHPUnit_Framework_MockObject_Invocation_Object extends PHPUnit_Framework_M
     public $object;
 
     /**
+    * @var boolean
+    */
+    public $evaluated;
+
+    /**
      * @param string $className
      * @param string $methodname
      * @param array  $parameters
@@ -71,5 +76,6 @@ class PHPUnit_Framework_MockObject_Invocation_Object extends PHPUnit_Framework_M
     {
         parent::__construct($className, $methodName, $parameters, $cloneObjects);
         $this->object = $object;
+        $this->evaluated = false;
     }
 }
