@@ -40,6 +40,11 @@ class PHPUnit_Framework_MockObject_Matcher_ConsecutiveParameters
   private $_invocations = array();
 
   /**
+   * @var array
+   */
+  private $_verificationStack = array();
+
+  /**
    * @param array $parameterGroups
    */
   public function __construct(array $parameterGroups)
@@ -79,6 +84,8 @@ class PHPUnit_Framework_MockObject_Matcher_ConsecutiveParameters
 
   public function verify()
   {
+      parent::verify();
+
       foreach ($this->_invocations as $callIndex => $invocation) {
         $this->verifyInvocation($invocation, $callIndex);
       }
@@ -93,6 +100,11 @@ class PHPUnit_Framework_MockObject_Matcher_ConsecutiveParameters
    */
   private function verifyInvocation(PHPUnit_Framework_MockObject_Invocation $invocation, $callIndex)
   {
+      if (isset($this->_verificationStack[$callIndex])) {
+          return;
+      }
+
+      $this->_verificationStack[$callIndex] = TRUE;
 
       if (isset($this->_parameterGroups[$callIndex])) {
           $parameters = $this->_parameterGroups[$callIndex];

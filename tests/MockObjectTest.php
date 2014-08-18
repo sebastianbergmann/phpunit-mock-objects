@@ -583,6 +583,7 @@ class Framework_MockObjectTest extends PHPUnit_Framework_TestCase
 
         try {
             $mock->right(array('second'));
+            $this->fail('Expected exception');
         } catch (PHPUnit_Framework_ExpectationFailedException $e) {
             $this->assertSame(
                 "Expectation failed for method name is equal to <string:right> when invoked 1 time(s)\n"
@@ -592,27 +593,60 @@ class Framework_MockObjectTest extends PHPUnit_Framework_TestCase
             );
         }
 
-        try {
-            $mock->__phpunit_verify();
-            $this->fail('Expected exception');
-        } catch (PHPUnit_Framework_ExpectationFailedException $e) {
-            $this->assertSame(
-                "Expectation failed for method name is equal to <string:right> when invoked 1 time(s).\n"
-                . "Parameter 0 for invocation SomeClass::right(Array (...)) does not match expected value.\n"
-                . "Failed asserting that two arrays are equal.\n"
-                . "--- Expected\n"
-                . "+++ Actual\n"
-                . "@@ @@\n"
-                . " Array (\n"
-                . "-    0 => 'first'\n"
-                . "-    1 => 'second'\n"
-                . "+    0 => 'second'\n"
-                . " )\n",
-                $e->getMessage()
-            );
-        }
-
         $this->resetMockObjects();
+    }
+
+    public function testVerificationOfMethodNameDoesNotFailWithUpdatedParameters()
+    {
+        $param = new \stdClass();
+        $param->foo = 'bar';
+
+        $mock = $this->getMock('SomeClass', array('method'), array(), '', TRUE, TRUE, TRUE);
+        $mock->expects($this->once())
+             ->method('method')
+             ->with($this->callback(function ($param) {
+                 $result = $param->foo === 'bar';
+                 $param->foo = 'baz';
+
+                 return $result;
+             }));
+
+        $mock->method($param);
+
+        $this->assertSame('baz', $param->foo);
+    }
+
+    public function testVerificationOfMethodNameDoesNotFailWithUpdatedConsecutiveParameters()
+    {
+        $param1 = new \stdClass();
+        $param1->foo = 'bar';
+
+        $param2 = new \stdClass();
+        $param2->foo = 'baz';
+
+        $mock = $this->getMock('SomeClass', array('method'), array(), '', TRUE, TRUE, TRUE);
+        $mock->expects($this->exactly(2))
+             ->method('method')
+             ->withConsecutive(
+                 array($this->callback(function ($param) {
+                     $result = $param->foo === 'bar';
+                     $param->foo = 'bat';
+
+                     return $result;
+                 })),
+                 array($this->callback(function ($param) {
+                     $result = $param->foo === 'baz';
+                     $param->foo = 'bat';
+
+                     return $result;
+                 }))
+             );
+
+        $mock->method($param1);
+        $mock->method($param2);
+
+        $this->assertSame('bat', $param1->foo);
+        $this->assertSame('bat', $param2->foo);
     }
 
     public function testVerificationOfNeverFailsWithEmptyParameters()

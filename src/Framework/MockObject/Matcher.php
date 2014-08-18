@@ -251,7 +251,7 @@ class PHPUnit_Framework_MockObject_Matcher implements PHPUnit_Framework_MockObje
 
             $invocationIsAny = get_class($this->invocationMatcher) === 'PHPUnit_Framework_MockObject_Matcher_AnyInvokedCount';
             $invocationIsNever = get_class($this->invocationMatcher) === 'PHPUnit_Framework_MockObject_Matcher_InvokedCount' && $this->invocationMatcher->isNever();
-            if (!$invocationIsAny && !$invocationIsNever) {
+            if (!$this->parametersMatcher->isVerified() && !$invocationIsAny && !$invocationIsNever) {
                 $this->parametersMatcher->verify();
             }
         } catch (PHPUnit_Framework_ExpectationFailedException $e) {
