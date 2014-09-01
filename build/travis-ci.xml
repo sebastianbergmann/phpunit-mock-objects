@@ -9,4 +9,3 @@
     <directory suffix=".phpt">../tests</directory>
   </testsuite>
 </phpunit>
-

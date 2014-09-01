@@ -137,13 +137,13 @@ class PHPUnit_Framework_MockObject_InvocationMocker implements PHPUnit_Framework
      */
     public function invoke(PHPUnit_Framework_MockObject_Invocation $invocation)
     {
-        $exception      = NULL;
-        $hasReturnValue = FALSE;
+        $exception      = null;
+        $hasReturnValue = false;
 
         if (strtolower($invocation->methodName) == '__tostring') {
             $returnValue = '';
         } else {
-            $returnValue = NULL;
+            $returnValue = null;
         }
 
         foreach ($this->matchers as $match) {
@@ -153,7 +153,7 @@ class PHPUnit_Framework_MockObject_InvocationMocker implements PHPUnit_Framework
 
                     if (!$hasReturnValue) {
                         $returnValue    = $value;
-                        $hasReturnValue = TRUE;
+                        $hasReturnValue = true;
                     }
                 }
             } catch (Exception $e) {

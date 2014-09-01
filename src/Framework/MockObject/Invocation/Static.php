@@ -103,7 +103,7 @@ class PHPUnit_Framework_MockObject_Invocation_Static implements PHPUnit_Framewor
      * @param array   $parameters
      * @param boolean $cloneObjects
      */
-    public function __construct($className, $methodName, array $parameters, $cloneObjects = FALSE)
+    public function __construct($className, $methodName, array $parameters, $cloneObjects = false)
     {
         $this->className  = $className;
         $this->methodName = $methodName;
@@ -148,20 +148,20 @@ class PHPUnit_Framework_MockObject_Invocation_Static implements PHPUnit_Framewor
      */
     protected function cloneObject($original)
     {
-        $cloneable = NULL;
+        $cloneable = null;
         $object    = new ReflectionObject($original);
 
         // Check the blacklist before asking PHP reflection to work around
         // https://bugs.php.net/bug.php?id=53967
         if ($object->isInternal() &&
             isset(self::$uncloneableExtensions[$object->getExtensionName()])) {
-            $cloneable = FALSE;
+            $cloneable = false;
         }
 
         if ($cloneable === NULL) {
             foreach (self::$uncloneableClasses as $class) {
                 if ($original instanceof $class) {
-                    $cloneable = FALSE;
+                    $cloneable = false;
                     break;
                 }
             }
@@ -177,7 +177,7 @@ class PHPUnit_Framework_MockObject_Invocation_Static implements PHPUnit_Framewor
         }
 
         if ($cloneable === NULL) {
-            $cloneable = TRUE;
+            $cloneable = true;
         }
 
         if ($cloneable) {

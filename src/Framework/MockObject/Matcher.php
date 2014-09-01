@@ -69,27 +69,27 @@ class PHPUnit_Framework_MockObject_Matcher implements PHPUnit_Framework_MockObje
     /**
      * @var mixed
      */
-    public $afterMatchBuilderId = NULL;
+    public $afterMatchBuilderId = null;
 
     /**
      * @var boolean
      */
-    public $afterMatchBuilderIsInvoked = FALSE;
+    public $afterMatchBuilderIsInvoked = false;
 
     /**
      * @var PHPUnit_Framework_MockObject_Matcher_MethodName
      */
-    public $methodNameMatcher = NULL;
+    public $methodNameMatcher = null;
 
     /**
      * @var PHPUnit_Framework_MockObject_Matcher_Parameters
      */
-    public $parametersMatcher = NULL;
+    public $parametersMatcher = null;
 
     /**
      * @var PHPUnit_Framework_MockObject_Stub
      */
-    public $stub = NULL;
+    public $stub = null;
 
     /**
      * @param PHPUnit_Framework_MockObject_Matcher_Invocation $invocationMatcher
@@ -163,7 +163,7 @@ class PHPUnit_Framework_MockObject_Matcher implements PHPUnit_Framework_MockObje
             $matcher = $builder->getMatcher();
 
             if ($matcher && $matcher->invocationMatcher->hasBeenInvoked()) {
-                $this->afterMatchBuilderIsInvoked = TRUE;
+                $this->afterMatchBuilderIsInvoked = true;
             }
         }
 
