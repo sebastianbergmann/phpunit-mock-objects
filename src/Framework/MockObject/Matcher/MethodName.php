@@ -76,7 +76,7 @@ class PHPUnit_Framework_MockObject_Matcher_MethodName extends PHPUnit_Framework_
             }
 
             $constraint = new PHPUnit_Framework_Constraint_IsEqual(
-              $constraint, 0, 10, FALSE, TRUE
+              $constraint, 0, 10, false, true
             );
         }
 
@@ -97,6 +97,6 @@ class PHPUnit_Framework_MockObject_Matcher_MethodName extends PHPUnit_Framework_
      */
     public function matches(PHPUnit_Framework_MockObject_Invocation $invocation)
     {
-        return $this->constraint->evaluate($invocation->methodName, '', TRUE);
+        return $this->constraint->evaluate($invocation->methodName, '', true);
     }
 }
