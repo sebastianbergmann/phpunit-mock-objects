@@ -145,4 +145,21 @@ class Framework_MockBuilderTest extends PHPUnit_Framework_TestCase
                      ->disableAutoload();
         $this->assertTrue($spec instanceof PHPUnit_Framework_MockObject_MockBuilder);
     }
+
+    public function testHhvmExceptionMethodsShouldNotBeMocked()
+    {
+        if (!defined('HHVM_VERSION')) {
+            $this->markTestSkipped('Only for HHVM');
+        }
+
+        $spec = $this->getMockBuilder('Exception');
+        $mock = $spec->getMock();
+        $this->assertTrue(method_exists($mock, 'getTraceOptions'));
+        $this->assertTrue(method_exists($mock, 'setTraceOptions'));
+
+        $spec = $this->getMockBuilder('InvalidArgumentException');
+        $mock2 = $spec->getMock();
+        $this->assertTrue(method_exists($mock2, 'getTraceOptions'));
+        $this->assertTrue(method_exists($mock2, 'setTraceOptions'));
+    }
 }

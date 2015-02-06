@@ -796,6 +796,7 @@ class PHPUnit_Framework_MockObject_Generator
                 $methods = array_merge($methods, get_class_methods('Iterator'));
             }
 
+            $this->maybeAddHhvmExceptionMethodsToBlacklisted($class);
             foreach ($methods as $methodName) {
                 try {
                     $method = $class->getMethod($methodName);
@@ -1126,5 +1127,17 @@ class PHPUnit_Framework_MockObject_Generator
     private function isVariadic(ReflectionParameter $parameter)
     {
         return method_exists('ReflectionParameter', 'isVariadic') && $parameter->isVariadic();
+    }
+
+    /**
+     * @param ReflectionClass $class
+     * @return null
+     */
+    private function maybeAddHhvmExceptionMethodsToBlacklisted(ReflectionClass $class)
+    {
+        if (defined('HHVM_VERSION') && ($class->isSubclassOf('Exception') || $class->isInstance(new Exception()))) {
+            $specialExceptionMethods = array('setTraceOptions' => TRUE, 'getTraceOptions' => TRUE);
+            $this->blacklistedMethodNames = array_merge($this->blacklistedMethodNames, $specialExceptionMethods);
+        }
     }
 }

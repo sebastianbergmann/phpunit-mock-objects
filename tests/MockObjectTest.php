@@ -873,6 +873,21 @@ class Framework_MockObjectTest extends PHPUnit_Framework_TestCase
         );
     }
 
+    public function testHhvmExceptionMethodsShouldNotBeMocked()
+    {
+        if (!defined('HHVM_VERSION')) {
+            $this->markTestSkipped('Only for HHVM');
+        }
+
+        $mock = $this->getMock('Exception');
+        $this->assertTrue(method_exists($mock, 'getTraceOptions'));
+        $this->assertTrue(method_exists($mock, 'setTraceOptions'));
+
+        $mock2 = $this->getMock('InvalidArgumentException');
+        $this->assertTrue(method_exists($mock2, 'getTraceOptions'));
+        $this->assertTrue(method_exists($mock2, 'setTraceOptions'));
+    }
+
     private function resetMockObjects()
     {
         $refl = new ReflectionObject($this);
