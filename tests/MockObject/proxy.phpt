@@ -78,7 +78,7 @@ class ProxyFoo extends Foo implements PHPUnit_Framework_MockObject_MockObject
         return call_user_func_array(array($this->__phpunit_originalObject, "baz"), $arguments);
     }
 
-    public function expects(PHPUnit_Framework_MockObject_Matcher_Invocation $matcher)
+    public function expects($matcher = null)
     {
         return $this->__phpunit_getInvocationMocker()->expects($matcher);
     }

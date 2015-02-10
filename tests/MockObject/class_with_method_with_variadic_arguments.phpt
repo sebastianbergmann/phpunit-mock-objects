@@ -60,7 +60,7 @@ class MockFoo extends ClassWithMethodWithVariadicArguments implements PHPUnit_Fr
         return $result;
     }
 
-    public function expects(PHPUnit_Framework_MockObject_Matcher_Invocation $matcher)
+    public function expects($matcher = null)
     {
         return $this->__phpunit_getInvocationMocker()->expects($matcher);
     }

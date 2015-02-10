@@ -31,7 +31,7 @@ class MockFoo extends NonExistentClass implements PHPUnit_Framework_MockObject_M
         $this->__phpunit_invocationMocker = clone $this->__phpunit_getInvocationMocker();
     }
 
-    public function expects(PHPUnit_Framework_MockObject_Matcher_Invocation $matcher)
+    public function expects($matcher = null)
     {
         return $this->__phpunit_getInvocationMocker()->expects($matcher);
     }
