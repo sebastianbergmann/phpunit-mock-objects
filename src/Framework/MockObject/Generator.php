@@ -278,7 +278,12 @@ class PHPUnit_Framework_MockObject_Generator
         if ($callOriginalMethods) {
             if (!is_object($proxyTarget)) {
                 if (count($arguments) == 0) {
-                    $proxyTarget = new $type;
+                    if (!$callOriginalConstructor) {
+                        $class       = new ReflectionClass($type);
+                        $proxyTarget = $class->newInstanceWithoutConstructor($arguments);
+                    } else {
+                        $proxyTarget = new $type;
+                    }
                 } else {
                     $class       = new ReflectionClass($type);
                     $proxyTarget = $class->newInstanceArgs($arguments);
@@ -794,7 +799,7 @@ class PHPUnit_Framework_MockObject_Generator
             $methodTemplate = new Text_Template(
                 $templateDir . 'mocked_class_method.tpl'
             );
-
+            
             $method = $methodTemplate->render();
         }
 

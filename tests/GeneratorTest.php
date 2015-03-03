@@ -173,4 +173,29 @@ class Framework_MockObject_GeneratorTest extends PHPUnit_Framework_TestCase
 
         $mock = $this->generator->getMock('SingletonClass', array('doSomething'), array(), '', false);
     }
+
+    /**
+     * Test the usage of both disabled constructor and proxying to the original methods
+     * @link http://stackoverflow.com/q/26038980
+     * @covers PHPUnit_Framework_MockObject_Generator::getObject
+     */
+    public function testGetMockWithDisabledConstructorWhileProxyingToOriginalMethods()
+    {
+        $mock = $this->generator->getMock(
+            /* type */ '\PHPUnit\Framework\MockObject\Tests\Fixture\MockableWithConstructorParamRequired',
+            /* methods */ array(),
+            /* constructorArgs */ array(),
+            /* mockClassName */ '',
+            /* originalConstructor */ false, /* default : true */
+            /* originalClone */ true,
+            /* autoload */ true,
+            /* cloneArguments */ false,
+            /* callOriginalMethods */ true, /* default : false */
+            /* proxyTarget */ null
+        );
+
+        $this->assertNotNull($mock);
+        $this->assertInstanceOf('\PHPUnit\Framework\MockObject\Tests\Fixture\MockableWithConstructorParamRequired', $mock);
+        $this->assertInstanceOf('\PHPUnit_Framework_MockObject_MockObject', $mock);
+    }
 }
