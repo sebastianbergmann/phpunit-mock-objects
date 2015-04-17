@@ -92,6 +92,8 @@ class PHPUnit_Framework_MockObject_Matcher_Parameters extends PHPUnit_Framework_
      */
     public function verify()
     {
+        parent::verify();
+
         if ($this->invocation === NULL) {
             throw new PHPUnit_Framework_ExpectationFailedException(
               'Mocked method does not exist.'

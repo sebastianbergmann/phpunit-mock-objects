@@ -26,6 +26,8 @@
  */
 abstract class PHPUnit_Framework_MockObject_Matcher_StatelessInvocation implements PHPUnit_Framework_MockObject_Matcher_Invocation
 {
+    private $_isVerified = FALSE;
+
     /**
      * Registers the invocation $invocation in the object as being invoked.
      * This will only occur after matches() returns true which means the
@@ -58,5 +60,16 @@ abstract class PHPUnit_Framework_MockObject_Matcher_StatelessInvocation implemen
      */
     public function verify()
     {
+        $this->_isVerified = TRUE;
+    }
+
+    /**
+     * Checks if the invocation has already been verified.
+     *
+     * @return bool
+     */
+    public function isVerified()
+    {
+        return $this->_isVerified;
     }
 }
