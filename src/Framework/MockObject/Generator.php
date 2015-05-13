@@ -1072,6 +1072,17 @@ class PHPUnit_Framework_MockObject_Generator
                         $default = ' = null';
                     }
                 }
+                
+                if (defined('HHVM_VERSION') && empty($typeHint) && isset($parameter->info) && isset($parameter->info['type_hint']) && !empty($parameter->info['type_hint'])) {
+                    
+                    $hh = 'HH\\';
+                    $typeHint = $parameter->info['type_hint'];
+                    if (strpos($parameter->info['type_hint'], $hh) === 0) {
+                        $typeHint = substr($parameter->info['type_hint'], strlen($hh));
+                    }
+                    
+                    $typeHint .= ' ';
+                }
             }
 
             if ($parameter->isPassedByReference()) {
