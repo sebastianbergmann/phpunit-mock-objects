@@ -30,6 +30,13 @@ class Framework_MockObjectTest extends PHPUnit_Framework_TestCase
              ->method('doSomething');
     }
 
+    public function testMockedMethodIsNeverCalledShortcut()
+    {
+        $mock = $this->getMock('AnInterface');
+        $mock->expectsNever()
+             ->method('doSomething');
+    }
+
     public function testMockedMethodIsNeverCalledWithParameter()
     {
         $mock = $this->getMock('SomeClass');
@@ -42,6 +49,14 @@ class Framework_MockObjectTest extends PHPUnit_Framework_TestCase
     {
         $mock = $this->getMock('SomeClass');
         $mock->expects($this->any())
+             ->method('doSomethingElse')
+             ->with('someArg');
+    }
+
+    public function testMockedMethodIsNotCalledWhenExpectsAnyWithParameterShortcut()
+    {
+        $mock = $this->getMock('SomeClass');
+        $mock->expectsAny()
              ->method('doSomethingElse')
              ->with('someArg');
     }
@@ -62,6 +77,15 @@ class Framework_MockObjectTest extends PHPUnit_Framework_TestCase
         $mock->doSomething();
     }
 
+    public function testMockedMethodIsCalledAtLeastOnceShortcut()
+    {
+        $mock = $this->getMock('AnInterface');
+        $mock->expectsAtLeastOnce()
+             ->method('doSomething');
+
+        $mock->doSomething();
+    }
+
     public function testMockedMethodIsCalledAtLeastOnce2()
     {
         $mock = $this->getMock('AnInterface');
@@ -72,10 +96,30 @@ class Framework_MockObjectTest extends PHPUnit_Framework_TestCase
         $mock->doSomething();
     }
 
+    public function testMockedMethodIsCalledAtLeastOnce2Shortcut()
+    {
+        $mock = $this->getMock('AnInterface');
+        $mock->expectsAtLeastOnce()
+             ->method('doSomething');
+
+        $mock->doSomething();
+        $mock->doSomething();
+    }
+
     public function testMockedMethodIsCalledAtLeastTwice()
     {
         $mock = $this->getMock('AnInterface');
         $mock->expects($this->atLeast(2))
+             ->method('doSomething');
+
+        $mock->doSomething();
+        $mock->doSomething();
+    }
+
+    public function testMockedMethodIsCalledAtLeastTwiceShortcut()
+    {
+        $mock = $this->getMock('AnInterface');
+        $mock->expectsAtLeast(2)
              ->method('doSomething');
 
         $mock->doSomething();
@@ -93,10 +137,31 @@ class Framework_MockObjectTest extends PHPUnit_Framework_TestCase
         $mock->doSomething();
     }
 
+    public function testMockedMethodIsCalledAtLeastTwice2Shortcut()
+    {
+        $mock = $this->getMock('AnInterface');
+        $mock->expectsAtLeast(2)
+             ->method('doSomething');
+
+        $mock->doSomething();
+        $mock->doSomething();
+        $mock->doSomething();
+    }
+
     public function testMockedMethodIsCalledAtMostTwice()
     {
         $mock = $this->getMock('AnInterface');
         $mock->expects($this->atMost(2))
+             ->method('doSomething');
+
+        $mock->doSomething();
+        $mock->doSomething();
+    }
+
+    public function testMockedMethodIsCalledAtMostTwiceShortcut()
+    {
+        $mock = $this->getMock('AnInterface');
+        $mock->expectsAtMost(2)
              ->method('doSomething');
 
         $mock->doSomething();
@@ -112,10 +177,28 @@ class Framework_MockObjectTest extends PHPUnit_Framework_TestCase
         $mock->doSomething();
     }
 
+    public function testMockedMethodIsCalledAtMosttTwice2Shortcut()
+    {
+        $mock = $this->getMock('AnInterface');
+        $mock->expectsAtMost(2)
+             ->method('doSomething');
+
+        $mock->doSomething();
+    }
+
     public function testMockedMethodIsCalledOnce()
     {
         $mock = $this->getMock('AnInterface');
         $mock->expects($this->once())
+             ->method('doSomething');
+
+        $mock->doSomething();
+    }
+
+    public function testMockedMethodIsCalledOnceShortcut()
+    {
+        $mock = $this->getMock('AnInterface');
+        $mock->expectsOnce()
              ->method('doSomething');
 
         $mock->doSomething();
@@ -135,6 +218,16 @@ class Framework_MockObjectTest extends PHPUnit_Framework_TestCase
     {
         $mock = $this->getMock('AnInterface');
         $mock->expects($this->exactly(2))
+             ->method('doSomething');
+
+        $mock->doSomething();
+        $mock->doSomething();
+    }
+
+    public function testMockedMethodIsCalledExactlyShortcut()
+    {
+        $mock = $this->getMock('AnInterface');
+        $mock->expectsExactly(2)
              ->method('doSomething');
 
         $mock->doSomething();

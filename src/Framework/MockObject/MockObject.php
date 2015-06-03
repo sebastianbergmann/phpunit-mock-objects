@@ -32,6 +32,74 @@ interface PHPUnit_Framework_MockObject_MockObject /*extends PHPUnit_Framework_Mo
     public function expects(PHPUnit_Framework_MockObject_Matcher_Invocation $matcher);
 
     /**
+     * Registers a new once occurring expectation in the mock object and returns the match
+     * object which can be infused with further details.
+     *
+     * @return PHPUnit_Framework_MockObject_Builder_InvocationMocker
+     */
+    public function expectsOnce();
+
+    /**
+     * Registers a new any time occurring expectation in the mock object and returns the match
+     * object which can be infused with further details.
+     *
+     * @return PHPUnit_Framework_MockObject_Builder_InvocationMocker
+     */
+    public function expectsAny();
+
+    /**
+     * Registers a new expectation occurring specific times in the mock object and returns the match
+     * object which can be infused with further details.
+     *
+     * @var int $count
+     * @return PHPUnit_Framework_MockObject_Builder_InvocationMocker
+     */
+    public function expectsExactly($count);
+
+    /**
+     * Registers a new never occurring expectation in the mock object and returns the match
+     * object which can be infused with further details.
+     *
+     * @return PHPUnit_Framework_MockObject_Builder_InvocationMocker
+     */
+    public function expectsNever();
+
+    /**
+     * Registers a new at specific sequence occurring expectation in the mock object and returns the match
+     * object which can be infused with further details.
+     *
+     * @var int $index
+     * @return PHPUnit_Framework_MockObject_Builder_InvocationMocker
+     */
+    public function expectsAt($index);
+
+    /**
+     * Registers a new at least once occurring expectation in the mock object and returns the match
+     * object which can be infused with further details.
+     *
+     * @return PHPUnit_Framework_MockObject_Builder_InvocationMocker
+     */
+    public function expectsAtLeastOnce();
+
+    /**
+     * Registers a new at given most occurring expectation in the mock object and returns the match
+     * object which can be infused with further details.
+     *
+     * @var int $count
+     * @return PHPUnit_Framework_MockObject_Builder_InvocationMocker
+     */
+    public function expectsAtMost($count);
+
+    /**
+     * Registers a new at given least occurring expectation in the mock object and returns the match
+     * object which can be infused with further details.
+     *
+     * @var int $count
+     * @return PHPUnit_Framework_MockObject_Builder_InvocationMocker
+     */
+    public function expectsAtLeast($count);
+
+    /**
      * @return PHPUnit_Framework_MockObject_InvocationMocker
      * @since  Method available since Release 2.0.0
      */
