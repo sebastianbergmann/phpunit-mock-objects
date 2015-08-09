@@ -806,6 +806,34 @@ class Framework_MockObjectTest extends PHPUnit_Framework_TestCase
         );
     }
 
+    public function testStubbedReturnGenerator()
+    {
+        if (version_compare(PHP_VERSION, '5.5.0', '<')) {
+            $this->markTestSkipped('Only for PHP >= 5.5.0');
+        }
+        $yieldValues = array('a', 'b');
+
+        $mock = $this->getMock('AnInterface');
+        $mock->expects($this->any())
+            ->method('doSomething')
+            ->will($this->returnGenerator($yieldValues));
+
+        $generator = $mock->doSomething();
+        $this->assertEquals('a', $generator->current());
+        $generator->next();
+        $this->assertEquals('b', $generator->current());
+
+        $mock = $this->getMock('AnInterface');
+        $mock->expects($this->any())
+            ->method('doSomething')
+            ->willReturnGenerator($yieldValues);
+
+        $generator = $mock->doSomething();
+        $this->assertEquals('a', $generator->current());
+        $generator->next();
+        $this->assertEquals('b', $generator->current());
+    }
+
     /**
      * @expectedException PHPUnit_Framework_MockObject_BadMethodCallException
      */
