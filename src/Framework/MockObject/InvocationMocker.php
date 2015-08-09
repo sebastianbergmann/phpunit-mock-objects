@@ -22,12 +22,12 @@ class PHPUnit_Framework_MockObject_InvocationMocker implements PHPUnit_Framework
     /**
      * @var PHPUnit_Framework_MockObject_Matcher_Invocation[]
      */
-    protected $matchers = array();
+    protected $matchers = [];
 
     /**
      * @var PHPUnit_Framework_MockObject_Builder_Match[]
      */
-    protected $builderMap = array();
+    protected $builderMap = [];
 
     /**
      * @param PHPUnit_Framework_MockObject_Matcher_Invocation $matcher
@@ -126,7 +126,11 @@ class PHPUnit_Framework_MockObject_InvocationMocker implements PHPUnit_Framework
             throw $exception;
         }
 
-        return $returnValue;
+        if ($hasReturnValue) {
+            return $returnValue;
+        }
+
+        return $invocation->generateReturnValue();
     }
 
     /**
