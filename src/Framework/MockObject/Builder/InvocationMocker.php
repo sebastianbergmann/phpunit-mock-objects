@@ -16,13 +16,7 @@
  * more natural way of reading the expectation. This class should be together
  * with the test case PHPUnit_Framework_MockObject_TestCase.
  *
- * @package    PHPUnit_MockObject
- * @author     Sebastian Bergmann <sebastian@phpunit.de>
- * @copyright  Sebastian Bergmann <sebastian@phpunit.de>
- * @license    http://www.opensource.org/licenses/BSD-3-Clause  The BSD 3-Clause License
- * @version    Release: @package_version@
- * @link       http://github.com/sebastianbergmann/phpunit-mock-objects
- * @since      Class available since Release 1.0.0
+ * @since Class available since Release 1.0.0
  */
 class PHPUnit_Framework_MockObject_Builder_InvocationMocker implements PHPUnit_Framework_MockObject_Builder_MethodNameMatch
 {
@@ -44,7 +38,7 @@ class PHPUnit_Framework_MockObject_Builder_InvocationMocker implements PHPUnit_F
     {
         $this->collection = $collection;
         $this->matcher    = new PHPUnit_Framework_MockObject_Matcher(
-          $invocationMatcher
+            $invocationMatcher
         );
 
         $this->collection->addMatcher($this->matcher);
@@ -103,7 +97,7 @@ class PHPUnit_Framework_MockObject_Builder_InvocationMocker implements PHPUnit_F
     public function willReturnMap(array $valueMap)
     {
         $stub = new PHPUnit_Framework_MockObject_Stub_ReturnValueMap(
-          $valueMap
+            $valueMap
         );
 
         return $this->will($stub);
@@ -116,7 +110,7 @@ class PHPUnit_Framework_MockObject_Builder_InvocationMocker implements PHPUnit_F
     public function willReturnArgument($argumentIndex)
     {
         $stub = new PHPUnit_Framework_MockObject_Stub_ReturnArgument(
-          $argumentIndex
+            $argumentIndex
         );
 
         return $this->will($stub);
@@ -129,7 +123,7 @@ class PHPUnit_Framework_MockObject_Builder_InvocationMocker implements PHPUnit_F
     public function willReturnCallback($callback)
     {
         $stub = new PHPUnit_Framework_MockObject_Stub_ReturnCallback(
-          $callback
+            $callback
         );
 
         return $this->will($stub);
@@ -140,7 +134,7 @@ class PHPUnit_Framework_MockObject_Builder_InvocationMocker implements PHPUnit_F
      */
     public function willReturnSelf()
     {
-        $stub = new PHPUnit_Framework_MockObject_Stub_ReturnSelf();
+        $stub = new PHPUnit_Framework_MockObject_Stub_ReturnSelf;
 
         return $this->will($stub);
     }
@@ -185,16 +179,16 @@ class PHPUnit_Framework_MockObject_Builder_InvocationMocker implements PHPUnit_F
      */
     private function canDefineParameters()
     {
-        if ($this->matcher->methodNameMatcher === NULL) {
+        if ($this->matcher->methodNameMatcher === null) {
             throw new PHPUnit_Framework_Exception(
-              'Method name matcher is not defined, cannot define parameter ' .
-              ' matcher without one'
+                'Method name matcher is not defined, cannot define parameter ' .
+                ' matcher without one'
             );
         }
 
-        if ($this->matcher->parametersMatcher !== NULL) {
+        if ($this->matcher->parametersMatcher !== null) {
             throw new PHPUnit_Framework_Exception(
-              'Parameter matcher is already defined, cannot redefine'
+                'Parameter matcher is already defined, cannot redefine'
             );
         }
     }
@@ -218,7 +212,8 @@ class PHPUnit_Framework_MockObject_Builder_InvocationMocker implements PHPUnit_F
      * @param  mixed ...$argument
      * @return PHPUnit_Framework_MockObject_Builder_InvocationMocker
      */
-    public function withConsecutive() {
+    public function withConsecutive()
+    {
 
         $args = func_get_args();
 
@@ -248,9 +243,9 @@ class PHPUnit_Framework_MockObject_Builder_InvocationMocker implements PHPUnit_F
      */
     public function method($constraint)
     {
-        if ($this->matcher->methodNameMatcher !== NULL) {
+        if ($this->matcher->methodNameMatcher !== null) {
             throw new PHPUnit_Framework_Exception(
-              'Method name matcher is already defined, cannot redefine'
+                'Method name matcher is already defined, cannot redefine'
             );
         }
 

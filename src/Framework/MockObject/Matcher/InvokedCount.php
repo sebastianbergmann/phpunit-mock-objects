@@ -16,23 +16,17 @@
  * If the number is less it will later be checked in verify() and also throw an
  * exception.
  *
- * @package    PHPUnit_MockObject
- * @author     Sebastian Bergmann <sebastian@phpunit.de>
- * @copyright  Sebastian Bergmann <sebastian@phpunit.de>
- * @license    http://www.opensource.org/licenses/BSD-3-Clause  The BSD 3-Clause License
- * @version    Release: @package_version@
- * @link       http://github.com/sebastianbergmann/phpunit-mock-objects
- * @since      Class available since Release 1.0.0
+ * @since Class available since Release 1.0.0
  */
 class PHPUnit_Framework_MockObject_Matcher_InvokedCount extends PHPUnit_Framework_MockObject_Matcher_InvokedRecorder
 {
     /**
-     * @var integer
+     * @var int
      */
     protected $expectedCount;
 
     /**
-     * @param integer $expectedCount
+     * @param int $expectedCount
      */
     public function __construct($expectedCount)
     {
@@ -40,7 +34,7 @@ class PHPUnit_Framework_MockObject_Matcher_InvokedCount extends PHPUnit_Framewor
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isNever()
     {
@@ -81,11 +75,10 @@ class PHPUnit_Framework_MockObject_Matcher_InvokedCount extends PHPUnit_Framewor
 
                 default: {
                     $message .= sprintf(
-                      'was not expected to be called more than %d times.',
-
-                      $this->expectedCount
+                        'was not expected to be called more than %d times.',
+                        $this->expectedCount
                     );
-                }
+                    }
             }
 
             throw new PHPUnit_Framework_ExpectationFailedException($message);
@@ -104,13 +97,12 @@ class PHPUnit_Framework_MockObject_Matcher_InvokedCount extends PHPUnit_Framewor
 
         if ($count !== $this->expectedCount) {
             throw new PHPUnit_Framework_ExpectationFailedException(
-              sprintf(
-                'Method was expected to be called %d times, ' .
-                'actually called %d times.',
-
-                $this->expectedCount,
-                $count
-              )
+                sprintf(
+                    'Method was expected to be called %d times, ' .
+                    'actually called %d times.',
+                    $this->expectedCount,
+                    $count
+                )
             );
         }
     }

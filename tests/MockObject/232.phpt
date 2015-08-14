@@ -1,11 +1,40 @@
 --TEST--
-PHPUnit_Framework_MockObject_Generator::generate('Foo', array(), 'MockFoo', true)
+PHPUnit_Framework_MockObject_Generator::generate('Foo', array(), 'MockFoo', true, true)
 --FILE--
 <?php
+trait BaseTrait
+{
+    protected function hello()
+    {
+        return 'hello';
+    }
+}
+
+trait ChildTrait
+{
+    use BaseTrait
+    {
+        hello as private hi;
+    }
+
+    protected function hello()
+    {
+        return 'hi';
+    }
+
+    protected function world()
+    {
+        return $this->hi();
+    }
+}
+
 class Foo
 {
-    public function __construct()
+    use ChildTrait;
+
+    public function speak()
     {
+        return $this->world();
     }
 }
 
@@ -17,6 +46,7 @@ $mock = $generator->generate(
     'Foo',
     array(),
     'MockFoo',
+    true,
     true
 );
 
@@ -31,6 +61,28 @@ class MockFoo extends Foo implements PHPUnit_Framework_MockObject_MockObject
     public function __clone()
     {
         $this->__phpunit_invocationMocker = clone $this->__phpunit_getInvocationMocker();
+    }
+
+    public function speak()
+    {
+        $arguments = array();
+        $count     = func_num_args();
+
+        if ($count > 0) {
+            $_arguments = func_get_args();
+
+            for ($i = 0; $i < $count; $i++) {
+                $arguments[] = $_arguments[$i];
+            }
+        }
+
+        $result = $this->__phpunit_getInvocationMocker()->invoke(
+            new PHPUnit_Framework_MockObject_Invocation_Object(
+                'Foo', 'speak', $arguments, '', $this, true
+            )
+        );
+
+        return $result;
     }
 
     public function expects(PHPUnit_Framework_MockObject_Matcher_Invocation $matcher)
@@ -73,3 +125,4 @@ class MockFoo extends Foo implements PHPUnit_Framework_MockObject_MockObject
         }
     }
 }
+
