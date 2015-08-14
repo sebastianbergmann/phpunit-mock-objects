@@ -81,11 +81,23 @@ class PHPUnit_Framework_MockObject_InvocationMocker implements PHPUnit_Framework
     }
 
     /**
-     * @param  PHPUnit_Framework_MockObject_Matcher_Invocation       $matcher
+     * @param  mixed $matcher
      * @return PHPUnit_Framework_MockObject_Builder_InvocationMocker
+     * @throws PHPUnit_Framework_MockObject_RuntimeException
      */
-    public function expects(PHPUnit_Framework_MockObject_Matcher_Invocation $matcher)
+    public function expects($matcher = null)
     {
+        if (is_null($matcher)) {
+            $matcher = new PHPUnit_Framework_MockObject_Matcher_InvokedAtLeastOnce;
+        } elseif (is_int($matcher)) {
+            $matcher = new PHPUnit_Framework_MockObject_Matcher_InvokedCount($matcher);
+        } elseif (!$matcher instanceof PHPUnit_Framework_MockObject_Matcher_Invocation) {
+            throw new PHPUnit_Framework_MockObject_RuntimeException(
+                'Matcher must be either a null or integer value, or a '
+                . 'PHPUnit_Framework_MockObject_Matcher_Invocation instance.'
+            );
+        }
+
         return new PHPUnit_Framework_MockObject_Builder_InvocationMocker(
             $this,
             $matcher

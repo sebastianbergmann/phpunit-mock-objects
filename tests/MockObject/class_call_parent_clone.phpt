@@ -34,7 +34,7 @@ class MockFoo extends Foo implements PHPUnit_Framework_MockObject_MockObject
         parent::__clone();
     }
 
-    public function expects(PHPUnit_Framework_MockObject_Matcher_Invocation $matcher)
+    public function expects($matcher = null)
     {
         return $this->__phpunit_getInvocationMocker()->expects($matcher);
     }
