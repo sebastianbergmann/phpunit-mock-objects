@@ -75,14 +75,17 @@ class PHPUnit_Framework_MockObject_Builder_InvocationMocker implements PHPUnit_F
     }
 
     /**
-     * @param  mixed                                                 $value
-     * @return PHPUnit_Framework_MockObject_Builder_InvocationMocker
+     * @param	mixed	$value
+     * @param 	mixed	$nextValues, ...
+     * @return 	PHPUnit_Framework_MockObject_Builder_InvocationMocker
      */
-    public function willReturn($value)
+    public function willReturn($value, ...$nextValues)
     {
-        $stub = new PHPUnit_Framework_MockObject_Stub_Return(
-            $value
-        );
+        $stub = count($nextValues) === 0 ?
+            new PHPUnit_Framework_MockObject_Stub_Return($value) :
+            new PHPUnit_Framework_MockObject_Stub_ConsecutiveCalls(
+               array_merge([$value], $nextValues)
+            );
 
         return $this->will($stub);
     }
@@ -137,14 +140,12 @@ class PHPUnit_Framework_MockObject_Builder_InvocationMocker implements PHPUnit_F
     }
 
     /**
-     * @param  mixed                                                 $value, ...
+     * @param  mixed                                                 $values, ...
      * @return PHPUnit_Framework_MockObject_Builder_InvocationMocker
      */
-    public function willReturnOnConsecutiveCalls()
+    public function willReturnOnConsecutiveCalls(...$values)
     {
-        $args = func_get_args();
-
-        $stub = new PHPUnit_Framework_MockObject_Stub_ConsecutiveCalls($args);
+        $stub = new PHPUnit_Framework_MockObject_Stub_ConsecutiveCalls($values);
 
         return $this->will($stub);
     }
