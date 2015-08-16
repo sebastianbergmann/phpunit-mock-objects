@@ -1,11 +1,16 @@
 --TEST--
-PHPUnit_Framework_MockObject_Generator::generate('Foo', array(), 'MockFoo', true)
+PHPUnit_Framework_MockObject_Generator::generate('Foo', array(), 'MockFoo', true, true)
+--SKIPIF--
+<?php
+if (!method_exists('ReflectionMethod', 'getReturnType')) print 'skip: PHP >= 7.0.0 required';
+?>
 --FILE--
 <?php
 class Foo
 {
-    public function __construct()
+    public static function bar(string $baz): Bar
     {
+        return 'test';
     }
 }
 
@@ -17,6 +22,7 @@ $mock = $generator->generate(
     'Foo',
     array(),
     'MockFoo',
+    true,
     true
 );
 
@@ -31,6 +37,11 @@ class MockFoo extends Foo implements PHPUnit_Framework_MockObject_MockObject
     public function __clone()
     {
         $this->__phpunit_invocationMocker = clone $this->__phpunit_getInvocationMocker();
+    }
+
+    public static function bar(string $baz): Bar
+    {
+        throw new PHPUnit_Framework_MockObject_BadMethodCallException;
     }
 
     public function expects(PHPUnit_Framework_MockObject_Matcher_Invocation $matcher)

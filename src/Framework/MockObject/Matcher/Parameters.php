@@ -15,20 +15,14 @@
  * checked against the defined constraints in $parameters. If the constraint
  * is met it will return true in matches().
  *
- * @package    PHPUnit_MockObject
- * @author     Sebastian Bergmann <sebastian@phpunit.de>
- * @copyright  Sebastian Bergmann <sebastian@phpunit.de>
- * @license    http://www.opensource.org/licenses/BSD-3-Clause  The BSD 3-Clause License
- * @version    Release: @package_version@
- * @link       http://github.com/sebastianbergmann/phpunit-mock-objects
- * @since      Class available since Release 1.0.0
+ * @since Class available since Release 1.0.0
  */
 class PHPUnit_Framework_MockObject_Matcher_Parameters extends PHPUnit_Framework_MockObject_Matcher_StatelessInvocation
 {
     /**
-     * @var array
+     * @var PHPUnit_Framework_Constraint[]
      */
-    protected $parameters = array();
+    protected $parameters = [];
 
     /**
      * @var PHPUnit_Framework_MockObject_Invocation
@@ -43,7 +37,7 @@ class PHPUnit_Framework_MockObject_Matcher_Parameters extends PHPUnit_Framework_
         foreach ($parameters as $parameter) {
             if (!($parameter instanceof PHPUnit_Framework_Constraint)) {
                 $parameter = new PHPUnit_Framework_Constraint_IsEqual(
-                  $parameter
+                    $parameter
                 );
             }
 
@@ -71,11 +65,12 @@ class PHPUnit_Framework_MockObject_Matcher_Parameters extends PHPUnit_Framework_
 
     /**
      * @param  PHPUnit_Framework_MockObject_Invocation $invocation
-     * @return boolean
+     * @return bool
      */
     public function matches(PHPUnit_Framework_MockObject_Invocation $invocation)
     {
         $this->invocation = $invocation;
+
         return $this->verify();
     }
 
@@ -92,9 +87,9 @@ class PHPUnit_Framework_MockObject_Matcher_Parameters extends PHPUnit_Framework_
      */
     public function verify()
     {
-        if ($this->invocation === NULL) {
+        if ($this->invocation === null) {
             throw new PHPUnit_Framework_ExpectationFailedException(
-              'Mocked method does not exist.'
+                'Mocked method does not exist.'
             );
         }
 
@@ -111,20 +106,19 @@ class PHPUnit_Framework_MockObject_Matcher_Parameters extends PHPUnit_Framework_
             }
 
             throw new PHPUnit_Framework_ExpectationFailedException(
-              sprintf($message, $this->invocation->toString())
+                sprintf($message, $this->invocation->toString())
             );
         }
 
         foreach ($this->parameters as $i => $parameter) {
             $parameter->evaluate(
-              $this->invocation->parameters[$i],
-              sprintf(
-                'Parameter %s for invocation %s does not match expected ' .
-                'value.',
-
-                $i,
-                $this->invocation->toString()
-              )
+                $this->invocation->parameters[$i],
+                sprintf(
+                    'Parameter %s for invocation %s does not match expected ' .
+                    'value.',
+                    $i,
+                    $this->invocation->toString()
+                )
             );
         }
 
