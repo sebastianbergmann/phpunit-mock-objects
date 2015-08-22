@@ -1115,6 +1115,6 @@ class PHPUnit_Framework_MockObject_Generator
             }
         }
 
-        return $methods;
+        return array_unique($methods);
     }
 }
