@@ -206,6 +206,36 @@ class Framework_MockObjectTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(null, $mock->doSomething('foo', 'bar'));
     }
 
+    public function testStubbedReturnValueMapAcceptsConstraints() {
+        $map = [
+            [$this->equalTo(0.6666, 0.01), '2/3'],
+            [$this->equalTo(0.2856, 0.01), '2/7']
+        ];
+        $mock = $this->getMock('AnInterface');
+        $mock->expects($this->any())
+            ->method('doSomething')
+            ->will($this->returnValueMap($map));
+        $this->assertEquals('2/3', $mock->doSomething(2/3));
+        $this->assertEquals('2/7', $mock->doSomething(2/7));
+    }
+
+    public function testStubbedReturnValueMapWorksWithAnythingConstraint() {
+        $map = [
+            [$this->equalTo('a'), 'b', 'c', 'd'],
+            ['e', $this->equalTo('f'), 'g', 'h'],
+            [$this->anything(), $this->anything(), $this->anything(), 'default']
+        ];
+
+        $mock = $this->getMock('AnInterface');
+        $mock->expects($this->any())
+            ->method('doSomething')
+            ->will($this->returnValueMap($map));
+
+        $this->assertEquals('d', $mock->doSomething('a', 'b', 'c'));
+        $this->assertEquals('h', $mock->doSomething('e', 'f', 'g'));
+        $this->assertEquals('default', $mock->doSomething('foo', 'bar', 'baz'));
+    }
+
     public function testStubbedReturnArgument()
     {
         $mock = $this->getMock('AnInterface');
