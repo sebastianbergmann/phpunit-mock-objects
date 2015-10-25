@@ -100,13 +100,7 @@ class PHPUnit_Framework_MockObject_InvocationMocker implements PHPUnit_Framework
     {
         $exception      = null;
         $hasReturnValue = false;
-
-        if (strtolower($invocation->methodName) == '__tostring') {
-            $hasReturnValue = true;
-            $returnValue    = '';
-        } else {
-            $returnValue = null;
-        }
+        $returnValue    = null;
 
         foreach ($this->matchers as $match) {
             try {

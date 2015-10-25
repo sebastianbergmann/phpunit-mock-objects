@@ -33,4 +33,16 @@ class PHPUnit_Framework_MockObject_Invocation_Object extends PHPUnit_Framework_M
         parent::__construct($className, $methodName, $parameters, $returnType, $cloneObjects);
         $this->object = $object;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function generateReturnValue()
+    {
+        if (strtolower($this->methodName) == '__tostring') {
+            return '';
+        }
+
+        return parent::generateReturnValue();
+    }
 }
