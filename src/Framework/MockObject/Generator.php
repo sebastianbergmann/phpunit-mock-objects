@@ -923,6 +923,10 @@ class PHPUnit_Framework_MockObject_Generator
             $reference = '';
         }
 
+        $deprecation = preg_match('#\*\s*+@deprecated (.*?)\r?\n\s*+\*(?:\s*+@|/$)#s', $method->getDocComment(), $deprecation)
+            ? trim(preg_replace('#\s*\r?\n\s*+\*\s*+#', ' ', $deprecation[1]))
+            : false;
+
         return $this->generateMockedMethodDefinition(
             $templateDir,
             $method->getDeclaringClass()->getName(),
@@ -933,7 +937,8 @@ class PHPUnit_Framework_MockObject_Generator
             $this->getMethodParameters($method, true),
             $reference,
             $callOriginalMethods,
-            $method->isStatic()
+            $method->isStatic(),
+            $deprecation
         );
     }
 
@@ -950,7 +955,7 @@ class PHPUnit_Framework_MockObject_Generator
      * @param  bool   $static
      * @return string
      */
-    protected function generateMockedMethodDefinition($templateDir, $className, $methodName, $cloneArguments = true, $modifier = 'public', $arguments_decl = '', $arguments_call = '', $reference = '', $callOriginalMethods = false, $static = false)
+    protected function generateMockedMethodDefinition($templateDir, $className, $methodName, $cloneArguments = true, $modifier = 'public', $arguments_decl = '', $arguments_call = '', $reference = '', $callOriginalMethods = false, $static = false, $deprecation = false)
     {
         if ($static) {
             $templateFile = 'mocked_static_method.tpl';
@@ -959,6 +964,17 @@ class PHPUnit_Framework_MockObject_Generator
                 '%s_method.tpl',
                 $callOriginalMethods ? 'proxied' : 'mocked'
             );
+        }
+
+        if (false !== $deprecation) {
+            $deprecation = "The $className::$methodName method is deprecated ($deprecation).";
+            $deprecationTemplate = new Text_Template($templateDir . 'deprecation.tpl');
+            $deprecationTemplate->setVar(
+                array(
+                'deprecation' => var_export($deprecation, true),
+                )
+            );
+            $deprecation = $deprecationTemplate->render();
         }
 
         $template = new Text_Template($templateDir . $templateFile);
@@ -972,6 +988,7 @@ class PHPUnit_Framework_MockObject_Generator
             'method_name'     => $methodName,
             'modifier'        => $modifier,
             'reference'       => $reference,
+            'deprecation'     => $deprecation,
             'clone_arguments' => $cloneArguments ? 'TRUE' : 'FALSE'
             )
         );
