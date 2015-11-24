@@ -817,6 +817,33 @@ class Framework_MockObjectTest extends PHPUnit_Framework_TestCase
         $mock->staticMethod();
     }
 
+    public function testInvokingStubbedStaticMethodWithStaticMethodsMockingEnabled()
+    {
+        // This test should look like the following instead of calling directly the mock object generator
+        // but we first need to update the "phpunit/phpunit" package with the new "mockStaticMethods" parameter.
+        // Let's see if this addition is accepted.
+        //
+        // $mock = $this->getMockBuilder('ClassWithStaticMethod')
+        //     ->enableStaticMethods()
+        //     ->getMock();
+
+        $mock = $this->getMockObjectGenerator()->getMock(
+            'ClassWithStaticMethod',
+            array(),
+            array(),
+            '',
+            true,
+            true,
+            true,
+            true,
+            false,
+            null,
+            false
+        );
+
+        $this->assertSame('test', $mock->staticMethod());
+    }
+
     /**
      * @see    https://github.com/sebastianbergmann/phpunit-mock-objects/issues/171
      * @ticket 171

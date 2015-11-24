@@ -71,6 +71,11 @@ class PHPUnit_Framework_MockObject_MockBuilder
     private $proxyTarget = null;
 
     /**
+     * @var bool
+     */
+    private $mockStaticMethods = true;
+
+    /**
      * @param PHPUnit_Framework_TestCase $testCase
      * @param array|string               $type
      */
@@ -97,7 +102,8 @@ class PHPUnit_Framework_MockObject_MockBuilder
             $this->autoload,
             $this->cloneArguments,
             $this->callOriginalMethods,
-            $this->proxyTarget
+            $this->proxyTarget,
+            $this->mockStaticMethods
         );
     }
 
@@ -116,7 +122,8 @@ class PHPUnit_Framework_MockObject_MockBuilder
             $this->originalClone,
             $this->autoload,
             $this->methods,
-            $this->cloneArguments
+            $this->cloneArguments,
+            $this->mockStaticMethods
         );
     }
 
@@ -135,7 +142,8 @@ class PHPUnit_Framework_MockObject_MockBuilder
             $this->originalClone,
             $this->autoload,
             $this->methods,
-            $this->cloneArguments
+            $this->cloneArguments,
+            $this->mockStaticMethods
         );
     }
 
@@ -316,6 +324,32 @@ class PHPUnit_Framework_MockObject_MockBuilder
     public function setProxyTarget($object)
     {
         $this->proxyTarget = $object;
+
+        return $this;
+    }
+
+    /**
+     * Enables the static method mocking (letting the mock calling the original static method).
+     *
+     * @return PHPUnit_Framework_MockObject_MockBuilder
+     * @since  Method available since Release 3.0.5
+     */
+    public function enableStaticMethods()
+    {
+        $this->mockStaticMethods = false;
+
+        return $this;
+    }
+
+    /**
+     * Disables the static method mocking (thow an exception when calling a mock static method).
+     *
+     * @return PHPUnit_Framework_MockObject_MockBuilder
+     * @since  Method available since Release 3.0.5
+     */
+    public function disableStaticMethods()
+    {
+        $this->mockStaticMethods = true;
 
         return $this;
     }
