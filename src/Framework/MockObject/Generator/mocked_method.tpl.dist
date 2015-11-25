@@ -1,6 +1,6 @@
 
     {modifier} function {reference}{method_name}({arguments_decl})
-    {
+    {{deprecation}
         $arguments = array({arguments_call});
         $count     = func_num_args();
 
