@@ -180,4 +180,17 @@ class Framework_MockObject_GeneratorTest extends PHPUnit_Framework_TestCase
     {
         $this->generator->getMock(StdClass::class, [], [], '', false, true, true, true, true);
     }
+
+    /**
+     * @covers PHPUnit_Framework_MockObject_Generator::getMockOverExistingObject
+     */
+    public function testGetMockOverExistingObject() {
+        $srcObject = new ClassWithProtectedMethod();
+        $this->assertEquals('real-value', $srcObject->testMethod());
+        $mock = $this->generator->getMockOverExistingObject($srcObject, []);
+        $mock->expects($this->any())
+             ->method('mockableProtectedMethod')
+             ->willReturn('test-value');
+        $this->assertEquals('test-value', $mock->testMethod());
+    }
 }

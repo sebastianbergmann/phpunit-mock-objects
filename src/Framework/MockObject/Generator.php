@@ -221,7 +221,8 @@ class PHPUnit_Framework_MockObject_Generator
             $callOriginalClone,
             $callAutoload,
             $cloneArguments,
-            $callOriginalMethods
+            $callOriginalMethods,
+            false
         );
 
         return $this->getObject(
@@ -234,6 +235,132 @@ class PHPUnit_Framework_MockObject_Generator
             $callOriginalMethods,
             $proxyTarget
         );
+    }
+
+    /**
+     * Returns a mock object enveloped over existing object overriding protected methods and making them public.
+     *
+     * @param object $envelopingObject
+     * @param  array $methods
+     * @param  string $mockClassName
+     * @param  bool $cloneArguments
+     * @return object
+     * @since  Method available since Release 1.0.0
+     */
+    public function getMockOverExistingObject($envelopingObject, $methods = [], $mockClassName = '', $cloneArguments = true)
+    {
+        $reflection = new \ReflectionClass($envelopingObject);
+        $type = get_class($envelopingObject);
+
+        if (!is_string($mockClassName)) {
+            throw PHPUnit_Util_InvalidArgumentHelper::factory(4, 'string');
+        }
+
+        if (!is_array($methods) && !is_null($methods)) {
+            throw PHPUnit_Util_InvalidArgumentHelper::factory(2, 'array', $methods);
+        }
+
+        foreach ($reflection->getMethods(\ReflectionMethod::IS_PROTECTED) as $method) {
+            if ($method->class == $type) {
+                $methods[] = $method->getName();
+            }
+        }
+        $methods = array_unique($methods);
+
+        if ($type === 'Traversable' || $type === '\\Traversable') {
+            $type = 'Iterator';
+        }
+
+        if (is_array($type)) {
+            $type = array_unique(array_map(
+                function ($type) {
+                    if ($type === 'Traversable' ||
+                      $type === '\\Traversable' ||
+                      $type === '\\Iterator') {
+                        return 'Iterator';
+                    }
+
+                    return $type;
+                },
+                $type
+            ));
+        }
+
+        if (null !== $methods) {
+            foreach ($methods as $method) {
+                if (!preg_match('~[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*~', $method)) {
+                    throw new PHPUnit_Framework_Exception(
+                        sprintf(
+                            'Cannot stub or mock method with invalid name "%s"',
+                            $method
+                        )
+                    );
+                }
+            }
+
+            if ($methods != array_unique($methods)) {
+                throw new PHPUnit_Framework_MockObject_RuntimeException(
+                    sprintf(
+                        'Cannot stub or mock using a method list that contains duplicates: "%s"',
+                        implode(', ', $methods)
+                    )
+                );
+            }
+        }
+
+        if ($mockClassName != '' && class_exists($mockClassName, false)) {
+            $reflect = new ReflectionClass($mockClassName);
+
+            if (!$reflect->implementsInterface('PHPUnit_Framework_MockObject_MockObject')) {
+                throw new PHPUnit_Framework_MockObject_RuntimeException(
+                    sprintf(
+                        'Class "%s" already exists.',
+                        $mockClassName
+                    )
+                );
+            }
+        }
+
+        $mock = $this->generate(
+            $type,
+            $methods,
+            $mockClassName,
+            true,
+            true,
+            $cloneArguments,
+            false,
+            true
+        );
+
+        return $this->getEnvelopedObject(
+            $mock['code'],
+            $mock['mockClassName'],
+            $envelopingObject
+        );
+    }
+
+    /**
+     * @param  string $code
+     * @param  string $className
+     * @param  object $srcObject
+     * @return object
+     */
+    private function getEnvelopedObject($code, $className, $srcObject)
+    {
+        $this->evalClass($code, $className);
+
+        $reflection = new \ReflectionClass($srcObject);
+        $mockReflection = new \ReflectionClass($className);
+        $newInstance = $mockReflection->newInstanceWithoutConstructor();
+        do {
+            foreach ($reflection->getProperties() as $prop) {
+                $prop->setAccessible(true);
+                $prop->setValue($newInstance, $prop->getValue($srcObject));
+            }
+            $reflection = $reflection->getParentClass();
+        } while ($reflection);
+
+        return $newInstance;
     }
 
     /**
@@ -498,9 +625,10 @@ class PHPUnit_Framework_MockObject_Generator
      * @param  bool         $callAutoload
      * @param  bool         $cloneArguments
      * @param  bool         $callOriginalMethods
+     * @param  bool         $protectedToPublic
      * @return array
      */
-    public function generate($type, array $methods = null, $mockClassName = '', $callOriginalClone = true, $callAutoload = true, $cloneArguments = true, $callOriginalMethods = false)
+    public function generate($type, array $methods = null, $mockClassName = '', $callOriginalClone = true, $callAutoload = true, $cloneArguments = true, $callOriginalMethods = false, $protectedToPublic = false)
     {
         if (is_array($type)) {
             sort($type);
@@ -527,7 +655,8 @@ class PHPUnit_Framework_MockObject_Generator
             $callOriginalClone,
             $callAutoload,
             $cloneArguments,
-            $callOriginalMethods
+            $callOriginalMethods,
+            $protectedToPublic
         );
 
         if (isset($key)) {
@@ -633,10 +762,11 @@ class PHPUnit_Framework_MockObject_Generator
      * @param  bool                        $callAutoload
      * @param  bool                        $cloneArguments
      * @param  bool                        $callOriginalMethods
+     * @param  bool                        $protectedToPublic
      * @return array
      * @throws PHPUnit_Framework_Exception
      */
-    private function generateMock($type, $methods, $mockClassName, $callOriginalClone, $callAutoload, $cloneArguments, $callOriginalMethods)
+    private function generateMock($type, $methods, $mockClassName, $callOriginalClone, $callAutoload, $cloneArguments, $callOriginalMethods, $protectedToPublic)
     {
         $templateDir   = dirname(__FILE__) . DIRECTORY_SEPARATOR . 'Generator' .
                          DIRECTORY_SEPARATOR;
@@ -772,7 +902,8 @@ class PHPUnit_Framework_MockObject_Generator
                             $templateDir,
                             $method,
                             $cloneArguments,
-                            $callOriginalMethods
+                            $callOriginalMethods,
+                            $protectedToPublic
                         );
                     }
                 } catch (ReflectionException $e) {
@@ -916,13 +1047,14 @@ class PHPUnit_Framework_MockObject_Generator
      * @param  ReflectionMethod $method
      * @param  bool             $cloneArguments
      * @param  bool             $callOriginalMethods
+     * @param  bool             $protectedToPublic
      * @return string
      */
-    private function generateMockedMethodDefinitionFromExisting($templateDir, ReflectionMethod $method, $cloneArguments, $callOriginalMethods)
+    private function generateMockedMethodDefinitionFromExisting($templateDir, ReflectionMethod $method, $cloneArguments, $callOriginalMethods, $protectedToPublic)
     {
         if ($method->isPrivate()) {
             $modifier = 'private';
-        } elseif ($method->isProtected()) {
+        } elseif ($method->isProtected() && !$protectedToPublic) {
             $modifier = 'protected';
         } else {
             $modifier = 'public';
