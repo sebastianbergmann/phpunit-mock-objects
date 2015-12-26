@@ -162,6 +162,17 @@ class PHPUnit_Framework_MockObject_Builder_InvocationMocker implements PHPUnit_F
     }
 
     /**
+     * @param  mixed                                             $values
+     * @return PHPUnit_Framework_MockObject_Builder_InvocationMocker
+     */
+    public function willYield(...$values)
+    {
+        $stub = new PHPUnit_Framework_MockObject_Stub_Yield($values);
+
+        return $this->will($stub);
+    }
+
+    /**
      * @param  mixed                                                 $id
      * @return PHPUnit_Framework_MockObject_Builder_InvocationMocker
      */
