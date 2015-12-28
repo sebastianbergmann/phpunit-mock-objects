@@ -23,6 +23,10 @@
         return $this->__phpunit_invocationMocker;
     }
 
+    public function __phpunit_callOriginal($methodName, $params) {
+      return parent::$methodName(...$params);
+    }
+
     public function __phpunit_hasMatchers()
     {
         return $this->__phpunit_getInvocationMocker()->hasMatchers();

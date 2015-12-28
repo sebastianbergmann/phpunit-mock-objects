@@ -162,6 +162,16 @@ class PHPUnit_Framework_MockObject_Builder_InvocationMocker implements PHPUnit_F
     }
 
     /**
+     * @return PHPUnit_Framework_MockObject_Builder_InvocationMocker
+     */
+    public function willCallOriginal()
+    {
+      $stub = new PHPUnit_Framework_MockObject_Stub_CallOriginal();
+
+      return $this->will($stub);
+    }
+
+    /**
      * @param  mixed                                                 $id
      * @return PHPUnit_Framework_MockObject_Builder_InvocationMocker
      */
