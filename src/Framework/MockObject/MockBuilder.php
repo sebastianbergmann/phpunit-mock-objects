@@ -145,7 +145,7 @@ class PHPUnit_Framework_MockObject_MockBuilder
      * @param  array|null                               $methods
      * @return PHPUnit_Framework_MockObject_MockBuilder
      */
-    public function setMethods($methods)
+    public function setMethods(array $methods = null)
     {
         $this->methods = $methods;
 
