@@ -117,6 +117,15 @@ class PHPUnit_Framework_MockObject_Builder_InvocationMocker implements PHPUnit_F
     }
 
     /**
+     * @return PHPUnit_Framework_MockObject_Builder_InvocationMocker
+     */
+    public function willReturnAllArguments()
+    {
+        $stub = new PHPUnit_Framework_MockObject_Stub_ReturnAllArguments(null);
+        return $this->will($stub);
+    }
+
+    /**
      * @param  callable                                              $callback
      * @return PHPUnit_Framework_MockObject_Builder_InvocationMocker
      */
