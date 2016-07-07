@@ -180,4 +180,19 @@ class Framework_MockObject_GeneratorTest extends PHPUnit_Framework_TestCase
     {
         $this->generator->getMock(stdClass::class, [], [], '', false, true, true, true, true);
     }
+
+    /**
+     * @covers PHPUnit_Framework_MockObject_Generator::getClassMethods
+     */
+    public function testGetClassMethodsByVisibility()
+    {
+        $methods = $this->generator->getClassMethods('ClassWithAllVisibility');
+
+        $this->assertEquals([
+            'fooPublicStatic',
+            'fooProtectedStatic',
+            'fooPublic',
+            'fooProtected'
+        ], $methods);
+    }
 }

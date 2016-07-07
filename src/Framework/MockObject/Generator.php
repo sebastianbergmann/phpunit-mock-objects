@@ -1249,7 +1249,7 @@ class PHPUnit_Framework_MockObject_Generator
         $methods = [];
 
         foreach ($class->getMethods() as $method) {
-            if ($method->isPublic() || $method->isAbstract()) {
+            if ($method->isPublic() || $method->isAbstract() || $method->isProtected()) {
                 $methods[] = $method->getName();
             }
         }
