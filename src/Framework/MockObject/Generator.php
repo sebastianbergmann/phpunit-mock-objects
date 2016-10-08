@@ -1184,7 +1184,10 @@ class PHPUnit_Framework_MockObject_Generator
             $typeDeclaration = '';
 
             if (!$forCall) {
-                if ($this->hasType($parameter) && (string) $parameter->getType() !== 'self') {
+
+                if ($this->hasType($parameter) &&
+                    (string) $parameter->getType() !== 'self' &&
+                    !defined('HHVM_VERSION')) {
                     $typeDeclaration = (string) $parameter->getType() . ' ';
                 } elseif ($parameter->isArray()) {
                     $typeDeclaration = 'array ';
