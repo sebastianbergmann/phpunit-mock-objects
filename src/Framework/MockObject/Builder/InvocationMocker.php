@@ -251,6 +251,20 @@ class PHPUnit_Framework_MockObject_Builder_InvocationMocker implements PHPUnit_F
     }
 
     /**
+     * @param array $arguments
+     *
+     * @return PHPUnit_Framework_MockObject_Builder_InvocationMocker
+     */
+    public function withConsecutiveArray(array $arguments)
+    {
+        $this->canDefineParameters();
+
+        $this->matcher->parametersMatcher = new PHPUnit_Framework_MockObject_Matcher_ConsecutiveParameters($arguments);
+
+        return $this;
+    }
+
+    /**
      * @return PHPUnit_Framework_MockObject_Builder_InvocationMocker
      */
     public function withAnyParameters()
