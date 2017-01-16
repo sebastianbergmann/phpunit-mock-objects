@@ -1117,12 +1117,25 @@ class PHPUnit_Framework_MockObject_Generator
     {
         if ($method->isConstructor() ||
             $method->isFinal() ||
+            $this->isReturnTypeFinal($method) ||
             $method->isPrivate() ||
             $this->isMethodNameBlacklisted($method->getName())) {
             return false;
         }
 
         return true;
+    }
+
+    /**
+     * @param ReflectionMethod $method
+     *
+     * @return bool
+     */
+    private function isReturnTypeFinal(ReflectionMethod $method)
+    {
+        return $this->hasReturnType($method) &&
+            class_exists($class = $method->getReturnType()->__toString()) &&
+            (new ReflectionClass($class))->isFinal();
     }
 
     /**
