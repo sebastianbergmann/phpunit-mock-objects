@@ -96,6 +96,15 @@ class PHPUnit_Framework_MockObject_Matcher_InvokedCount extends PHPUnit_Framewor
     {
         $count = $this->getInvocationCount();
 
+        if (is_int($this->expectedCount) === false) {
+            throw new ExpectationFailedException(
+                sprintf(
+                    'Expected an integer when comparing number of invocations, got %s',
+                    gettype($this->expectedCount)
+                )
+            );
+        }
+
         if ($count !== $this->expectedCount) {
             throw new ExpectationFailedException(
                 sprintf(
