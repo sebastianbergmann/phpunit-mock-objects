@@ -484,6 +484,17 @@ class Framework_MockObjectTest extends TestCase
         $this->assertInstanceOf(Traversable::class, $mock);
     }
 
+    /**
+     * @dataProvider throwableProvider
+     */
+    public function testGetMockForThrowable($type)
+    {
+        $mock = $this->getMockBuilder($type)
+            ->getMock();
+
+        $this->assertInstanceOf(Throwable::class, $mock);
+    }
+
     public function testMultipleInterfacesCanBeMockedInSingleObject()
     {
         $mock = $this->getMockBuilder([AnInterface::class, AnotherInterface::class])
@@ -1016,6 +1027,17 @@ class Framework_MockObjectTest extends TestCase
           [['Traversable']],
           [['Iterator','Traversable']],
           [['\Iterator','\Traversable']]
+        ];
+    }
+    public function throwableProvider()
+    {
+        return [
+          ['Exception'],
+          ['ThrowableMockTestClass'],
+          ['ThrowableMockTestInterface'],
+          ['\Throwable'],
+          ['Throwable'],
+          [['\Iterator', '\Throwable']],
         ];
     }
 
