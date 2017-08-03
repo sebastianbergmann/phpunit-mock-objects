@@ -1034,4 +1034,27 @@ class Framework_MockObjectTest extends TestCase
             $mock->bar('call_' . $i);
         }
     }
+
+    public function testVerificationOfExpectedInvokeCountDoesThrowIfNotInteger()
+    {
+        $mock = $this->getMockBuilder(SomeClass::class)
+             ->setMethods(['foo'])
+             ->getMock();
+
+        $mock->expects($this->exactly(1.0))
+            ->method('foo');
+
+        try {
+            $mock->__phpunit_verify();
+            $this->fail('Expected exception');
+        } catch (ExpectationFailedException $e) {
+            $this->assertSame(
+                "Expectation failed for method name is equal to <string:foo> when invoked 1 time(s).\n"
+                . "Expected an integer when comparing number of invocations, got double\n",
+                $e->getMessage()
+            );
+        }
+
+        $this->resetMockObjects();
+    }
 }
