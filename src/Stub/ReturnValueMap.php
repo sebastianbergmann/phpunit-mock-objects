@@ -29,9 +29,9 @@ class PHPUnit_Framework_MockObject_Stub_ReturnValueMap implements PHPUnit_Framew
                 continue;
             }
 
-            $return = array_pop($map);
-            if ($invocation->parameters === $map) {
-                return $return;
+            $returnValue = $this->getReturnValue(array_pop($map));
+            if ($this->compare($invocation->parameters, $map)) {
+                return $returnValue->invoke($invocation);
             }
         }
 
@@ -41,5 +41,33 @@ class PHPUnit_Framework_MockObject_Stub_ReturnValueMap implements PHPUnit_Framew
     public function toString()
     {
         return 'return value from a map';
+    }
+
+    /**
+     * @param  array $actual
+     * @param  array $expected
+     * @return bool
+     */
+    protected function compare($actual, $expected) {
+        foreach ($expected as $index => $value) {
+            if ($value instanceof PHPUnit_Framework_Constraint) {
+                if ($value->evaluate($actual[$index], '', true) === false) {
+                    return false;
+                }
+            } else {
+                if ($value !== $actual[$index]) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    protected function getReturnValue($value) {
+      if (!$value instanceOf PHPUnit_Framework_MockObject_Stub) {
+        return new PHPUnit_Framework_MockObject_Stub_Return($value);
+      }
+      return $value;
     }
 }
