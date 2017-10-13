@@ -729,8 +729,7 @@ class Framework_MockObjectTest extends TestCase
                 . " Array (\n"
                 . "-    0 => 'first'\n"
                 . "-    1 => 'second'\n"
-                . "+    0 => 'second'\n"
-                . " )\n",
+                . "+    0 => 'second'\n",
                 $e->getMessage()
             );
         }
