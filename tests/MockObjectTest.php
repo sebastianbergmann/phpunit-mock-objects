@@ -938,16 +938,6 @@ class Framework_MockObjectTest extends TestCase
     }
 
     /**
-     * @expectedException PHPUnit_Framework_MockObject_BadMethodCallException
-     */
-    public function testInvokingStubbedStaticMethodRaisesException()
-    {
-        $mock = $this->getMockBuilder(ClassWithStaticMethod::class)->getMock();
-
-        $mock->staticMethod();
-    }
-
-    /**
      * @see    https://github.com/sebastianbergmann/phpunit-mock-objects/issues/171
      * @ticket 171
      */
