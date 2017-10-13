@@ -939,18 +939,6 @@ class Framework_MockObjectTest extends TestCase
     }
 
     /**
-     * @see    https://github.com/sebastianbergmann/phpunit-mock-objects/issues/156
-     * @ticket 156
-     */
-    public function testInterfaceWithStaticMethodCanBeStubbed()
-    {
-        $this->assertInstanceOf(
-            InterfaceWithStaticMethod::class,
-            $this->getMockBuilder(InterfaceWithStaticMethod::class)->getMock()
-        );
-    }
-
-    /**
      * @expectedException PHPUnit_Framework_MockObject_BadMethodCallException
      */
     public function testInvokingStubbedStaticMethodRaisesException()
