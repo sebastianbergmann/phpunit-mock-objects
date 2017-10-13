@@ -1139,12 +1139,29 @@ class PHPUnit_Framework_MockObject_Generator
         $methods = [];
 
         foreach ($class->getMethods() as $method) {
-            if ($method->isPublic() || $method->isAbstract()) {
+            if ($this->isAvailableOutsideTheClass($method) && !$this->shouldRetainBehaviour($method)) {
                 $methods[] = $method->getName();
             }
         }
 
         return $methods;
+    }
+
+    /**
+     * @param ReflectionMethod $method
+     * @return bool
+     */
+    public function isAvailableOutsideTheClass(ReflectionMethod $method){
+        return !$method->isPrivate();
+    }
+
+    /**
+     * @param ReflectionMethod $method
+     * @return bool
+     * non final and non static methods can retain their behaviour
+     */
+    public function shouldRetainBehaviour(ReflectionMethod $method){
+        return ( $method->isFinal() || $method->isStatic() );
     }
 
     /**

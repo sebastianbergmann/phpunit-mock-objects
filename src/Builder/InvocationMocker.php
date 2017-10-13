@@ -276,7 +276,8 @@ class PHPUnit_Framework_MockObject_Builder_InvocationMocker implements PHPUnit_F
         if (is_string($constraint) && !in_array(strtolower($constraint), $this->configurableMethods)) {
             throw new PHPUnit_Framework_MockObject_RuntimeException(
                 sprintf(
-                    'Trying to configure method "%s" which cannot be configured because it does not exist, has not been specified, is final, or is static',
+                    'Trying to configure method "%s" which cannot be configured because it does not exist, has not been specified, is private, is protected, is final, or is static
+',
                     $constraint
                 )
             );

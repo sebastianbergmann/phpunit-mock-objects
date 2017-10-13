@@ -57,7 +57,7 @@ class MockFoo extends Foo implements PHPUnit_Framework_MockObject_MockObject
 {
     private $__phpunit_invocationMocker;
     private $__phpunit_originalObject;
-    private $__phpunit_configurable = ['speak'];
+    private $__phpunit_configurable = ['speak', 'hello', 'world'];
 
     public function __clone()
     {
@@ -80,6 +80,50 @@ class MockFoo extends Foo implements PHPUnit_Framework_MockObject_MockObject
         $result = $this->__phpunit_getInvocationMocker()->invoke(
             new PHPUnit_Framework_MockObject_Invocation_Object(
                 'Foo', 'speak', $arguments, '', $this, true
+            )
+        );
+
+        return $result;
+    }
+
+    protected function hello()
+    {
+        $arguments = array();
+        $count     = func_num_args();
+
+        if ($count > 0) {
+            $_arguments = func_get_args();
+
+            for ($i = 0; $i < $count; $i++) {
+                $arguments[] = $_arguments[$i];
+            }
+        }
+
+        $result = $this->__phpunit_getInvocationMocker()->invoke(
+            new PHPUnit_Framework_MockObject_Invocation_Object(
+                'Foo', 'hello', $arguments, '', $this, true
+            )
+        );
+
+        return $result;
+    }
+
+    protected function world()
+    {
+        $arguments = array();
+        $count     = func_num_args();
+
+        if ($count > 0) {
+            $_arguments = func_get_args();
+
+            for ($i = 0; $i < $count; $i++) {
+                $arguments[] = $_arguments[$i];
+            }
+        }
+
+        $result = $this->__phpunit_getInvocationMocker()->invoke(
+            new PHPUnit_Framework_MockObject_Invocation_Object(
+                'Foo', 'world', $arguments, '', $this, true
             )
         );
 
@@ -126,4 +170,3 @@ class MockFoo extends Foo implements PHPUnit_Framework_MockObject_MockObject
         }
     }
 }
-

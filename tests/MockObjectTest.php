@@ -729,8 +729,7 @@ class Framework_MockObjectTest extends TestCase
                 . " Array (\n"
                 . "-    0 => 'first'\n"
                 . "-    1 => 'second'\n"
-                . "+    0 => 'second'\n"
-                . " )\n",
+                . "+    0 => 'second'\n",
                 $e->getMessage()
             );
         }
@@ -936,28 +935,6 @@ class Framework_MockObjectTest extends TestCase
 
         $this->assertStringStartsWith('Mock_GoogleSearch_', get_class($a));
         $this->assertEquals(get_class($a), get_class($b));
-    }
-
-    /**
-     * @see    https://github.com/sebastianbergmann/phpunit-mock-objects/issues/156
-     * @ticket 156
-     */
-    public function testInterfaceWithStaticMethodCanBeStubbed()
-    {
-        $this->assertInstanceOf(
-            InterfaceWithStaticMethod::class,
-            $this->getMockBuilder(InterfaceWithStaticMethod::class)->getMock()
-        );
-    }
-
-    /**
-     * @expectedException PHPUnit_Framework_MockObject_BadMethodCallException
-     */
-    public function testInvokingStubbedStaticMethodRaisesException()
-    {
-        $mock = $this->getMockBuilder(ClassWithStaticMethod::class)->getMock();
-
-        $mock->staticMethod();
     }
 
     /**
