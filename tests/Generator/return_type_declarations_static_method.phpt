@@ -29,16 +29,11 @@ class MockFoo extends Foo implements PHPUnit_Framework_MockObject_MockObject
 {
     private $__phpunit_invocationMocker;
     private $__phpunit_originalObject;
-    private $__phpunit_configurable = ['bar'];
+    private $__phpunit_configurable = [];
 
     public function __clone()
     {
         $this->__phpunit_invocationMocker = clone $this->__phpunit_getInvocationMocker();
-    }
-
-    public static function bar(string $baz): Bar
-    {
-        throw new PHPUnit_Framework_MockObject_BadMethodCallException('Static method "bar" cannot be invoked on mock object');
     }
 
     public function expects(PHPUnit_Framework_MockObject_Matcher_Invocation $matcher)
