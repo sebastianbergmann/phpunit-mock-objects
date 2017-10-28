@@ -174,6 +174,16 @@ class PHPUnit_Framework_MockObject_Builder_InvocationMocker implements PHPUnit_F
 
         return $this->will($stub);
     }
+    
+    /**
+     * @param mixed $values, ...
+     *
+     * @return PHPUnit_Framework_MockObject_Builder_InvocationMocker
+     */
+    public function willReturnConsecutiveResult(...$values)
+    {
+        return $this->willReturnOnConsecutiveCalls(...$values);
+    }
 
     /**
      * @param Exception $exception
