@@ -130,6 +130,16 @@ class InvocationMocker implements MethodNameMatch
 
         return $this->will($stub);
     }
+    
+    /**
+     * @param array $valueMap
+     *
+     * @return PHPUnit_Framework_MockObject_Builder_InvocationMocker
+     */
+    public function willReturnValueMap(array $valueMap)
+    {
+        return $this->willReturnMap($valueMap);
+    }
 
     /**
      * @param mixed $argumentIndex
