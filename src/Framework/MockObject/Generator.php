@@ -236,6 +236,10 @@ class PHPUnit_Framework_MockObject_Generator
     {
         $this->evalClass($code, $className);
 
+        if (is_array($type) && count($type) > 0) {
+            $type = reset($type);
+        }
+
         if ($callOriginalConstructor &&
             is_string($type) &&
             !interface_exists($type, $callAutoload)) {
@@ -265,7 +269,7 @@ class PHPUnit_Framework_MockObject_Generator
         }
 
         if ($callOriginalMethods) {
-            if (!is_object($proxyTarget)) {
+            if (!is_object($proxyTarget) && $proxyTarget !== 'parent') {
                 if (count($arguments) == 0) {
                     $proxyTarget = new $type;
                 } else {
@@ -487,13 +491,16 @@ class PHPUnit_Framework_MockObject_Generator
      */
     public function generate($type, array $methods = null, $mockClassName = '', $callOriginalClone = true, $callAutoload = true, $cloneArguments = true, $callOriginalMethods = false)
     {
-        if (is_array($type)) {
-            sort($type);
-        }
-
         if ($mockClassName == '') {
+            $key = $type;
+
+            if (is_array($type)) {
+                sort($key);
+                $key = implode('_', $key);
+            }
+
             $key = md5(
-                is_array($type) ? implode('_', $type) : $type .
+                $key .
                 serialize($methods) .
                 serialize($callOriginalClone) .
                 serialize($cloneArguments) .
@@ -728,9 +735,8 @@ class PHPUnit_Framework_MockObject_Generator
             $cloneTemplate = $cloneTemplate->render();
         }
 
-        if (is_array($methods) && empty($methods) &&
-            ($isClass || $isInterface)) {
-            $methods = $this->getClassMethods($mockClassName['fullClassName']);
+        if (is_array($methods) && (($isClass && empty($methods)) || $isInterface)) {
+            $methods = array_unique(array_merge($this->getClassMethods($mockClassName['fullClassName']), $methods));
         }
 
         if (!is_array($methods)) {
@@ -818,39 +824,38 @@ class PHPUnit_Framework_MockObject_Generator
      * @param  string       $prefix
      * @return array
      */
-    protected function generateClassName($type, $className, $prefix)
+    protected function generateClassName(&$type, $className, $prefix)
     {
         if (is_array($type)) {
-            $type = implode('_', $type);
+            $type = array_map(function ($v) {
+                return ltrim($v, '\\');
+            }, $type);
+            $fullClassName = array_shift($type);
+        } else {
+            $fullClassName = $type = ltrim($type, '\\');
         }
 
-        if ($type[0] == '\\') {
-            $type = substr($type, 1);
-        }
-
-        $classNameParts = explode('\\', $type);
-
-        if (count($classNameParts) > 1) {
-            $type          = array_pop($classNameParts);
-            $namespaceName = implode('\\', $classNameParts);
-            $fullClassName = $namespaceName . '\\' . $type;
+        $pos = strrpos($fullClassName, '\\');
+        if ($pos !== false) {
+            $namespaceName = substr($fullClassName, 0, $pos);
+            $originalClassName = substr($fullClassName, $pos + 1);
         } else {
             $namespaceName = '';
-            $fullClassName = $type;
+            $originalClassName = $fullClassName;
         }
 
         if ($className == '') {
             do {
-                $className = $prefix . $type . '_' .
+                $className = $prefix . $originalClassName . '_' .
                              substr(md5(microtime()), 0, 8);
             } while (class_exists($className, false));
         }
 
-        return array(
-          'className'         => $className,
-          'originalClassName' => $type,
-          'fullClassName'     => $fullClassName,
-          'namespaceName'     => $namespaceName
+        return compact(
+          'className',
+          'originalClassName',
+          'fullClassName',
+          'namespaceName'
         );
     }
 
@@ -874,21 +879,14 @@ class PHPUnit_Framework_MockObject_Generator
                 $interfaces
             );
 
-            if (!in_array($mockClassName['originalClassName'], $additionalInterfaces)) {
-                $buffer .= ', ';
-
-                if (!empty($mockClassName['namespaceName'])) {
-                    $buffer .= $mockClassName['namespaceName'] . '\\';
-                }
-
-                $buffer .= $mockClassName['originalClassName'];
+            if (!in_array($mockClassName['fullClassName'], $additionalInterfaces)) {
+                $buffer .= ', ' . $mockClassName['fullClassName'];
             }
         } else {
             $buffer .= sprintf(
-                '%s extends %s%s implements %s',
+                '%s extends %s implements %s',
                 $mockClassName['className'],
-                !empty($mockClassName['namespaceName']) ? $mockClassName['namespaceName'] . '\\' : '',
-                $mockClassName['originalClassName'],
+                $mockClassName['fullClassName'],
                 $interfaces
             );
         }
@@ -906,7 +904,7 @@ class PHPUnit_Framework_MockObject_Generator
     protected function generateMockedMethodDefinitionFromExisting($templateDir, ReflectionMethod $method, $cloneArguments, $callOriginalMethods)
     {
         if ($method->isPrivate()) {
-            $modifier = 'private';
+            $modifier = 'private'; // @codeCoverageIgnore
         } elseif ($method->isProtected()) {
             $modifier = 'protected';
         } else {
