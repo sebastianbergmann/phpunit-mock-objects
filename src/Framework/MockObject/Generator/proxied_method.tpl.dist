@@ -12,11 +12,11 @@
             }
         }
 
-        $this->__phpunit_getInvocationMocker()->invoke(
+        $result = $this->__phpunit_getInvocationMocker()->invoke(
           new PHPUnit_Framework_MockObject_Invocation_Object(
             '{class_name}', '{method_name}', $arguments, $this, {clone_arguments}
           )
         );
 
-        return call_user_func_array(array($this->__phpunit_originalObject, "{method_name}"), $arguments);
+        return isset($result) ? $result : call_user_func_array(array($this->__phpunit_originalObject, '{method_name}'), $arguments);
     }

@@ -5,4 +5,9 @@ class Foo
     {
         return $bar->doSomethingElse();
     }
+
+    public function &doSomethingByRef(&$a = null)
+    {
+        return $a;
+    }
 }

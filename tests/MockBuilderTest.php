@@ -86,11 +86,23 @@ class Framework_MockBuilderTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($cloned->cloned);
     }
 
+    /**
+     * @expectedException PHPUnit_Framework_MockObject_RuntimeException
+     * @expectedExceptionMessage Class "Prophecy\Prophecy\RevealerInterface" does not exist.
+     */
     public function testCallingAutoloadCanBeDisabled()
     {
-        // it is not clear to me how to test this nor the difference
-        // between calling it or not
-        $this->markTestIncomplete();
+        $this->getMockBuilder('Prophecy\Prophecy\RevealerInterface')
+            ->disableAutoload()
+            ->getMockForAbstractClass();
+    }
+
+    /**
+     * @depends testCallingAutoloadCanBeDisabled
+     */
+    public function testPostDisabledAutoload()
+    {
+        $this->assertTrue(interface_exists('Prophecy\Prophecy\RevealerInterface', true));
     }
 
     public function testProvidesAFluentInterface()
@@ -103,5 +115,29 @@ class Framework_MockBuilderTest extends PHPUnit_Framework_TestCase
                      ->disableOriginalClone()
                      ->disableAutoload();
         $this->assertTrue($spec instanceof PHPUnit_Framework_MockObject_MockBuilder);
+    }
+
+    /**
+     * @requires PHP 5.4.0
+     */
+    public function testGetMockForTrait()
+    {
+        $spec = $this->getMockBuilder('AbstractTrait')
+            ->setMethods(array('mockableMethod'))
+            ->enableOriginalConstructor()
+            ->enableAutoload()
+            ->enableOriginalClone()
+            ->disableArgumentCloning()
+            ->setProxyTarget('parent')
+            ->disableProxyingToOriginalMethods();
+
+        $mock = $spec->getMockForTrait();
+        $mock->expects($this->once())->method('mockableMethod')->willReturn(false);
+        $mock->expects($this->once())->method('doSomething')->with(false);
+
+        $this->assertTrue(method_exists($mock, 'doSomething'));
+        $this->assertFalse($mock->mockableMethod());
+        $this->assertTrue($mock->anotherMockableMethod());
+        $this->assertNull($mock->doSomething(false));
     }
 }

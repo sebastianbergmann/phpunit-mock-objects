@@ -1,14 +1,28 @@
 language: php
 
+matrix:
+  include:
+    - php: 5.3.3
+      dist: precise
+    - php: 5.3
+      dist: precise
+  allow_failures:
+    - php: hhvm
+  fast_finish: true
+
+cache:
+  directories:
+    - vendor
+    - $HOME/.composer/cache
+
 before_script:
-  - composer self-update
-  - composer install --no-interaction --prefer-source --dev
+  - if [[ $TRAVIS_PHP_VERSION = 5.3.3 ]]; then composer config -g -- disable-tls true; composer config -g -- secure-http false; fi;
+  - travis_retry composer self-update
+  - travis_retry composer install --no-interaction --prefer-source --dev
 
 script: ./vendor/bin/phpunit --configuration ./build/travis-ci.xml
 
 php:
-  - 5.3.3
-  - 5.3
   - 5.4
   - 5.5
   - 5.6
