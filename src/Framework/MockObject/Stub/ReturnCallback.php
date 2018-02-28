@@ -44,7 +44,8 @@ class PHPUnit_Framework_MockObject_Stub_ReturnCallback implements PHPUnit_Framew
                 $this->callback[1]
             );
         } else {
-            return 'return result of user defined callback ' . $this->callback .
+            return 'return result of user defined callback ' .
+                   ($this->callback instanceof Closure ? 'Closure' : $this->callback) .
                    ' with the passed arguments';
         }
     }

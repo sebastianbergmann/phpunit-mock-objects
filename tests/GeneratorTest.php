@@ -458,4 +458,82 @@ class Framework_MockObject_GeneratorTest extends PHPUnit_Framework_TestCase
         $this->assertTrue(method_exists($object, $method = 'foo'));
         $this->assertTrue($object->$method());
     }
+
+    public function testGetMockWithNamespacedMockClassNameForInterface()
+    {
+        $mock = $this->getMock('ArrayAccess', array($method = 'foo'), array(), $class = 'Bar\Foo\Container');
+        $mock->expects($this->once())->method($method)->with($method)->willReturnSelf();
+        $mock->expects($this->exactly(2))->method('offsetGet')->with($method)->willReturnArgument(0);
+        $mock->expects($this->once())->method('offsetExists')->with($method)->willReturnCallback(array($mock, 'offsetGet'));
+
+        $this->assertInstanceOf($class, $mock);
+        $this->assertTrue(class_exists($class, false));
+
+        $this->assertSame($mock, $mock->$method($method));
+        $this->assertEquals($method, $mock[$method]);
+        $this->assertNotEmpty(isset($mock[$method]));
+
+        // verify `toString()` methods
+        $matchers = $this->readAttribute($mock->__phpunit_getInvocationMocker(), 'matchers');
+        $this->assertTrue(is_array($matchers));
+
+        $desc = array();
+        foreach ($matchers as $matcher)
+            $desc[] = $matcher->toString();
+
+        $this->assertNotEmpty($desc);
+        $this->assertEquals(array(
+            'invoked 1 time(s) where method name is equal to <string:foo> and with parameter 0 is equal to <string:foo> will return the current object',
+            'invoked 2 time(s) where method name is equal to <string:offsetGet> and with parameter 0 is equal to <string:foo> will return argument #0',
+            'invoked 1 time(s) where method name is equal to <string:offsetExists> and with parameter 0 is equal to <string:foo> will return result of user defined callback Bar\Foo\Container->offsetGet() with the passed arguments',
+        ), $desc);
+    }
+
+    public function testGetMockWithNamespacedMockClassNameForNotFoundClass()
+    {
+        $mock = $this->getMock($class = 'NotFoundClass', array($method = 'foo'), array(), 'NS\MockNotFound');
+        $mock->expects($this->once())->method($method)->willReturnArgument(0);
+
+        $this->assertInstanceOf($class, $mock);
+        $this->assertTrue(class_exists($class, false));
+        $this->assertTrue(class_exists('NS\MockNotFound', false));
+
+        $this->assertNull($mock->$method());
+    }
+
+    public function testGetMockWithNamespacedMockClassName()
+    {
+        $mock = $this->getMock(array($class = 'NS\NotFoundClass', 'ArrayAccess'), array($method = 'foo'), array(), 'Bar\Foo\MockNotFound');
+        $mock->expects($this->once())->method($method)->willReturn(true);
+        $mock->expects($this->once())->method('offsetGet')->with($method)->willReturnMap(array(
+            array($method, true),
+        ));
+        $mock->expects($this->once())->method('offsetExists')->with($method)->willReturnCallback(function () {
+            return false;
+        });
+
+        $this->assertInstanceOf($class, $mock);
+        $this->assertInstanceOf('ArrayAccess', $mock);
+        $this->assertTrue(class_exists($class, false));
+        $this->assertTrue(class_exists('Bar\Foo\MockNotFound', false));
+
+        $this->assertTrue($mock->$method($method));
+        $this->assertFalse(isset($mock[$method]));
+        $this->assertTrue($mock[$method]);
+
+        // verify `toString()` methods
+        $matchers = $this->readAttribute($mock->__phpunit_getInvocationMocker(), 'matchers');
+        $this->assertTrue(is_array($matchers));
+
+        $desc = array();
+        foreach ($matchers as $matcher)
+            $desc[] = $matcher->toString();
+
+        $this->assertNotEmpty($desc);
+        $this->assertEquals(array(
+            'invoked 1 time(s) where method name is equal to <string:foo> will return user-specified value true',
+            'invoked 1 time(s) where method name is equal to <string:offsetGet> and with parameter 0 is equal to <string:foo> will return value from a map',
+            'invoked 1 time(s) where method name is equal to <string:offsetExists> and with parameter 0 is equal to <string:foo> will return result of user defined callback Closure with the passed arguments',
+        ), $desc);
+    }
 }

@@ -658,9 +658,9 @@ class PHPUnit_Framework_MockObject_Generator
                     );
                 }
 
-                $additionalInterfaces[] = $_type;
+                $additionalInterfaces[$_type] = $this->getClassMethods($_type);
 
-                foreach ($this->getClassMethods($_type) as $method) {
+                foreach ($additionalInterfaces[$_type] as $method) {
                     if (in_array($method, $methods)) {
                         throw new PHPUnit_Framework_Exception(
                             sprintf(
@@ -743,40 +743,36 @@ class PHPUnit_Framework_MockObject_Generator
             $methods = array();
         }
 
-        $mockedMethods = '';
+        // https://github.com/sebastianbergmann/phpunit-mock-objects/issues/103
+        if ($isInterface && isset($class) && $class->implementsInterface('Traversable') &&
+            !$class->implementsInterface('Iterator') &&
+            !$class->implementsInterface('IteratorAggregate')) {
+            $additionalInterfaces['Iterator'] = $this->getClassMethods('Iterator');
+            $methods                          = array_unique(array_merge($methods, $additionalInterfaces['Iterator']));
+        }
 
-        if (isset($class)) {
-            // https://github.com/sebastianbergmann/phpunit-mock-objects/issues/103
-            if ($isInterface && $class->implementsInterface('Traversable') &&
-                !$class->implementsInterface('Iterator') &&
-                !$class->implementsInterface('IteratorAggregate')) {
-                $additionalInterfaces[] = 'Iterator';
-                $methods                = array_merge($methods, $this->getClassMethods('Iterator'));
+        $mockedMethods = '';
+        foreach ($methods as $methodName) {
+            try {
+                $method = isset($class) ? $class->getMethod($methodName) : null;
+            } catch (ReflectionException $e) {
+                $method = null;
             }
 
-            foreach ($methods as $methodName) {
-                try {
-                    $method = $class->getMethod($methodName);
+            if (empty($method) && !empty($additionalInterfaces)) {
+                $method = $this->pickMethodFromInterfaces($methodName, $additionalInterfaces);
+            }
 
-                    if ($this->canMockMethod($method)) {
-                        $mockedMethods .= $this->generateMockedMethodDefinitionFromExisting(
-                            $templateDir,
-                            $method,
-                            $cloneArguments,
-                            $callOriginalMethods
-                        );
-                    }
-                } catch (ReflectionException $e) {
-                    $mockedMethods .= $this->generateMockedMethodDefinition(
+            if (!empty($method)) {
+                if ($this->canMockMethod($method)) {
+                    $mockedMethods .= $this->generateMockedMethodDefinitionFromExisting(
                         $templateDir,
-                        $mockClassName['fullClassName'],
-                        $methodName,
-                        $cloneArguments
+                        $method,
+                        $cloneArguments,
+                        $callOriginalMethods
                     );
                 }
-            }
-        } else {
-            foreach ($methods as $methodName) {
+            } else {
                 $mockedMethods .= $this->generateMockedMethodDefinition(
                     $templateDir,
                     $mockClassName['fullClassName'],
@@ -787,7 +783,6 @@ class PHPUnit_Framework_MockObject_Generator
         }
 
         $method = '';
-
         if (!in_array('method', $methods)) {
             $methodTemplate = new Text_Template(
                 $templateDir . 'mocked_class_method.tpl'
@@ -803,7 +798,7 @@ class PHPUnit_Framework_MockObject_Generator
             'class_declaration' => $this->generateMockClassDeclaration(
                 $mockClassName,
                 $isInterface,
-                $additionalInterfaces
+                array_keys($additionalInterfaces)
             ),
             'clone'             => $cloneTemplate,
             'mock_class_name'   => $mockClassName['className'],
@@ -812,8 +807,9 @@ class PHPUnit_Framework_MockObject_Generator
             )
         );
 
+        // support mockClassName within a namespace
         return array(
-          'code'          => $classTemplate->render(),
+          'code'          => $this->patchNamespaceForMockClassName($mockClassName['className'], $classTemplate->render(), $prologue, $epilogue),
           'mockClassName' => $mockClassName['className']
         );
     }
@@ -824,7 +820,7 @@ class PHPUnit_Framework_MockObject_Generator
      * @param  string       $prefix
      * @return array
      */
-    protected function generateClassName(&$type, $className, $prefix)
+    protected static function generateClassName(&$type, $className, $prefix)
     {
         if (is_array($type)) {
             $type = array_map(function ($v) {
@@ -860,17 +856,47 @@ class PHPUnit_Framework_MockObject_Generator
     }
 
     /**
+     * Use for multi-interfaces mocking, to fetch methods from interfaces correctly.
+     * <code>$this->getMock(array('NS\Foo', 'ArrayAccess', 'Traversable'), array('foo'));</code>
+     *
+     * @param  string $methodName
+     * @param  array $additionalInterfaces
+     * @return ReflectionMethod|null
+     */
+    protected static function pickMethodFromInterfaces($methodName, array $additionalInterfaces = array())
+    {
+        foreach ($additionalInterfaces as $type => $methods) {
+            if (in_array($methodName, $methods)) {
+                return new ReflectionMethod($type, $methodName);
+            }
+        }
+        return null;
+    }
+
+    /**
      * @param  array $mockClassName
      * @param  bool  $isInterface
      * @param  array $additionalInterfaces
      * @return array
      */
-    protected function generateMockClassDeclaration(array $mockClassName, $isInterface, array $additionalInterfaces = array())
+    protected static function generateMockClassDeclaration(array $mockClassName, $isInterface, array $additionalInterfaces = array())
     {
         $buffer = 'class ';
 
+        $sep = strrpos($mockClassName['className'], '\\');
+        if ($sep === false) {
+            $sep = '';
+        } else {
+            $mockClassName['className'] = substr($mockClassName['className'], $sep + 1);
+            $sep = '\\';
+        }
+
+        if ($isInterface && !in_array($mockClassName['fullClassName'], $additionalInterfaces)) {
+            $additionalInterfaces[] = $mockClassName['fullClassName'];
+        }
+
         $additionalInterfaces[] = 'PHPUnit_Framework_MockObject_MockObject';
-        $interfaces             = implode(', ', $additionalInterfaces);
+        $interfaces             = $sep . implode(', ' . $sep, $additionalInterfaces);
 
         if ($isInterface) {
             $buffer .= sprintf(
@@ -878,20 +904,60 @@ class PHPUnit_Framework_MockObject_Generator
                 $mockClassName['className'],
                 $interfaces
             );
-
-            if (!in_array($mockClassName['fullClassName'], $additionalInterfaces)) {
-                $buffer .= ', ' . $mockClassName['fullClassName'];
-            }
         } else {
             $buffer .= sprintf(
-                '%s extends %s implements %s',
+                '%s extends %s%s implements %s',
                 $mockClassName['className'],
+                $sep,
                 $mockClassName['fullClassName'],
                 $interfaces
             );
         }
 
         return $buffer;
+    }
+
+    /**
+     * Support mockClassName within a namespace. e.g.
+     * <code>$this->getMock('ArrayAccess', array('foo'), array(), 'Bar\Foo\Container');</code>
+     *
+     * @param  string $mockClassName
+     * @param  string $code
+     * @param  string $prologue
+     * @param  string $epilogue
+     * @return string
+     */
+    protected static function patchNamespaceForMockClassName($mockClassName, $code, &$prologue = null, &$epilogue = null)
+    {
+        if (($pos = strrpos($mockClassName, '\\')) === false) {
+            return $code;
+        }
+
+        if (!empty($prologue)) {
+            $code = substr($code, strlen($prologue));
+        }
+        if (!empty($epilogue)) {
+            $code = substr($code, 0, -strlen($epilogue));
+        }
+
+        if (empty($prologue)) {
+            $prologue = '';
+        } elseif (substr($prologue, 0, 6) == 'class ') {
+            $prologue = "namespace {\n\n" . $prologue . "}\n\n";
+        } else {
+            $prologue = strstr($prologue, 'namespace {', true);
+        }
+
+        $prologue .= 'namespace ' . substr($mockClassName, 0, $pos) . " {\n\n";
+        $epilogue = "\n}\n";
+
+        $code = str_replace(
+            array(' expects(PHPUnit_Framework_MockObject_', ' new PHPUnit_Framework_MockObject_'),
+            array(' expects(\PHPUnit_Framework_MockObject_', ' new \PHPUnit_Framework_MockObject_'),
+            $code
+        );
+
+        return $prologue . $code . $epilogue;
     }
 
     /**
@@ -948,7 +1014,7 @@ class PHPUnit_Framework_MockObject_Generator
      * @param  bool   $static
      * @return string
      */
-    protected function generateMockedMethodDefinition($templateDir, $className, $methodName, $cloneArguments = true, $modifier = 'public', $arguments_decl = '', $arguments_call = '', $reference = '', $callOriginalMethods = false, $static = false)
+    protected static function generateMockedMethodDefinition($templateDir, $className, $methodName, $cloneArguments = true, $modifier = 'public', $arguments_decl = '', $arguments_call = '', $reference = '', $callOriginalMethods = false, $static = false)
     {
         if ($static) {
             $templateFile = 'mocked_static_method.tpl';
@@ -1082,7 +1148,7 @@ class PHPUnit_Framework_MockObject_Generator
      * @return bool
      * @since  Method available since Release 2.2.1
      */
-    private function isVariadic(ReflectionParameter $parameter)
+    private static function isVariadic(ReflectionParameter $parameter)
     {
         return method_exists('ReflectionParameter', 'isVariadic') && $parameter->isVariadic();
     }
@@ -1092,7 +1158,7 @@ class PHPUnit_Framework_MockObject_Generator
      * @return bool
      * @since  Method available since Release 2.3.4
      */
-    private function hasType(ReflectionParameter $parameter)
+    private static function hasType(ReflectionParameter $parameter)
     {
         return method_exists('ReflectionParameter', 'hasType') && $parameter->hasType();
     }
@@ -1102,7 +1168,7 @@ class PHPUnit_Framework_MockObject_Generator
      * @return array
      * @since  Method available since Release 2.3.2
      */
-    private function getClassMethods($className)
+    private static function getClassMethods($className)
     {
         $class   = new ReflectionClass($className);
         $methods = array();
