@@ -7,6 +7,7 @@ All notable changes are documented in this file using the [Keep a CHANGELOG](htt
 ### Fixed
 
 * Fixed [#418](https://github.com/sebastianbergmann/phpunit-mock-objects/issues/418): Parameters named `$arguments`, `$count`, `$i`, or `$result` are mangled by generated code
+* Fixed [#419](https://github.com/sebastianbergmann/phpunit-mock-objects/issues/419): Constants as default parameter values are not handled correctly
 
 ## [6.1.1] - 2018-04-11
 
