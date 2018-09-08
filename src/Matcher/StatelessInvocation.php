@@ -44,8 +44,6 @@ abstract class StatelessInvocation implements Invocation
      * the matcher will get the invoked() method called which should check if an
      * expectation is met.
      *
-     * @param Invocation $invocation Object containing information on a mocked or stubbed method which was invoked
-     *
      * @return bool
      */
     public function verify()
