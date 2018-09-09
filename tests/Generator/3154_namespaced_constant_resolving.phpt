@@ -1,58 +1,69 @@
 --TEST--
-https://github.com/sebastianbergmann/phpunit-mock-objects/issues/397
---SKIPIF--
-<?php
-if (!version_compare(PHP_VERSION, '7.1', '>=')) print 'skip: PHP >= 7.1 required';
+https://github.com/sebastianbergmann/phpunit-mock-objects/issues/420
+https://github.com/sebastianbergmann/phpunit/issues/3154
 --FILE--
 <?php
-class C
+namespace Is\Namespaced;
+/*
+ * This file is part of PHPUnit.
+ *
+ * (c) Sebastian Bergmann <sebastian@phpunit.de>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+const A_CONSTANT = 17;
+const PHP_VERSION = "0.0.0";
+
+class Issue3154
 {
-    public function m(?self $other): self
+    public function a(int $i = PHP_INT_MAX, int $j = A_CONSTANT, string $v = \PHP_VERSION, string $z = '#'): string
     {
+        return $z."sum: ".($i+$j).$v;
     }
 }
-
 require __DIR__ . '/../../vendor/autoload.php';
 
 $generator = new \PHPUnit\Framework\MockObject\Generator;
 
 $mock = $generator->generate(
-    C::class,
+    Issue3154::class,
     [],
-    'MockC',
+    'Issue3154Mock',
     true,
     true
 );
 
 print $mock['code'];
 --EXPECT--
-class MockC extends C implements PHPUnit\Framework\MockObject\MockObject
+class Issue3154Mock extends Is\Namespaced\Issue3154 implements PHPUnit\Framework\MockObject\MockObject
 {
     private $__phpunit_invocationMocker;
     private $__phpunit_originalObject;
-    private $__phpunit_configurable = ['m'];
+    private $__phpunit_configurable = ['a'];
 
     public function __clone()
     {
         $this->__phpunit_invocationMocker = clone $this->__phpunit_getInvocationMocker();
     }
 
-    public function m(?C $other): C
+    public function a(int $i = PHP_INT_MAX, int $j = Is\Namespaced\A_CONSTANT, string $v = PHP_VERSION, string $z = '#'): string
     {
-        $arguments = [$other];
+        $arguments = array($i, $j, $v, $z);
         $count     = func_num_args();
 
-        if ($count > 1) {
+        if ($count > 4) {
             $_arguments = func_get_args();
 
-            for ($i = 1; $i < $count; $i++) {
+            for ($i = 4; $i < $count; $i++) {
                 $arguments[] = $_arguments[$i];
             }
         }
 
         $result = $this->__phpunit_getInvocationMocker()->invoke(
             new \PHPUnit\Framework\MockObject\Invocation\ObjectInvocation(
-                'C', 'm', $arguments, 'C', $this, true
+                'Is\Namespaced\Issue3154', 'a', $arguments, 'string', $this, true
             )
         );
 
@@ -66,10 +77,9 @@ class MockC extends C implements PHPUnit\Framework\MockObject\MockObject
 
     public function method()
     {
-        $any     = new \PHPUnit\Framework\MockObject\Matcher\AnyInvokedCount;
+        $any = new \PHPUnit\Framework\MockObject\Matcher\AnyInvokedCount;
         $expects = $this->expects($any);
-
-        return call_user_func_array([$expects, 'method'], func_get_args());
+        return call_user_func_array(array($expects, 'method'), func_get_args());
     }
 
     public function __phpunit_setOriginalObject($originalObject)

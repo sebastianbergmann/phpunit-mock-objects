@@ -1,13 +1,10 @@
 --TEST--
-https://github.com/sebastianbergmann/phpunit-mock-objects/issues/397
---SKIPIF--
-<?php
-if (!version_compare(PHP_VERSION, '7.1', '>=')) print 'skip: PHP >= 7.1 required';
+\PHPUnit\Framework\MockObject\Generator::generate('Foo', [], 'MockFoo', true, true)
 --FILE--
 <?php
-class C
+class Foo
 {
-    public function m(?self $other): self
+    public function bar(int $baz = PHP_INT_MIN)
     {
     }
 }
@@ -17,29 +14,30 @@ require __DIR__ . '/../../vendor/autoload.php';
 $generator = new \PHPUnit\Framework\MockObject\Generator;
 
 $mock = $generator->generate(
-    C::class,
+    'Foo',
     [],
-    'MockC',
+    'MockFoo',
     true,
     true
 );
 
 print $mock['code'];
+?>
 --EXPECT--
-class MockC extends C implements PHPUnit\Framework\MockObject\MockObject
+class MockFoo extends Foo implements PHPUnit\Framework\MockObject\MockObject
 {
     private $__phpunit_invocationMocker;
     private $__phpunit_originalObject;
-    private $__phpunit_configurable = ['m'];
+    private $__phpunit_configurable = ['bar'];
 
     public function __clone()
     {
         $this->__phpunit_invocationMocker = clone $this->__phpunit_getInvocationMocker();
     }
 
-    public function m(?C $other): C
+    public function bar(int $baz = PHP_INT_MIN)
     {
-        $arguments = [$other];
+        $arguments = array($baz);
         $count     = func_num_args();
 
         if ($count > 1) {
@@ -52,7 +50,7 @@ class MockC extends C implements PHPUnit\Framework\MockObject\MockObject
 
         $result = $this->__phpunit_getInvocationMocker()->invoke(
             new \PHPUnit\Framework\MockObject\Invocation\ObjectInvocation(
-                'C', 'm', $arguments, 'C', $this, true
+                'Foo', 'bar', $arguments, '', $this, true
             )
         );
 
@@ -66,10 +64,9 @@ class MockC extends C implements PHPUnit\Framework\MockObject\MockObject
 
     public function method()
     {
-        $any     = new \PHPUnit\Framework\MockObject\Matcher\AnyInvokedCount;
+        $any = new \PHPUnit\Framework\MockObject\Matcher\AnyInvokedCount;
         $expects = $this->expects($any);
-
-        return call_user_func_array([$expects, 'method'], func_get_args());
+        return call_user_func_array(array($expects, 'method'), func_get_args());
     }
 
     public function __phpunit_setOriginalObject($originalObject)
